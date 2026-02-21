@@ -7,25 +7,28 @@ export default function Navbar() {
     const { theme, toggleTheme } = useTheme();
 
     return (
-        <nav className="h-16 border-b border-slate-200 dark:border-slate-800 glass sticky top-0 z-40">
+        <nav className="h-16 border-b border-slate-200 dark:border-white/5 glass sticky top-0 z-40 transition-all duration-300">
             <div className="h-full px-4 md:px-6 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    {/* Mobile menu could go here */}
+                <div className="flex items-center gap-2 opacity-0">
+                    {/* Placeholder for alignment */}
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-5">
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={toggleTheme}
-                        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition-colors"
+                        className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 dark:hover:text-white transition-colors duration-300"
                     >
                         {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
                     </motion.button>
 
-                    <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-accent to-blue-400 flex items-center justify-center text-white shadow-md cursor-pointer hover:shadow-lg transition-all">
-                        <User size={16} />
-                    </div>
+                    <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="h-9 w-9 rounded-full bg-gradient-to-tr from-primary via-accent to-secondary flex items-center justify-center text-white cursor-pointer shadow-neon-cyan hover:shadow-neon-purple border border-white/20 transition-all duration-300"
+                    >
+                        <User size={18} />
+                    </motion.div>
                 </div>
             </div>
         </nav>

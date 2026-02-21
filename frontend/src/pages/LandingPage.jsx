@@ -30,120 +30,137 @@ const agents = [
 
 export default function LandingPage() {
     return (
-        <div className="min-h-screen bg-background-light dark:bg-background-dark overflow-hidden relative selection:bg-accent/30 text-slate-900 dark:text-slate-50 font-sans">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.3 } }}
+            transition={{ duration: 0.8 }}
+            className="min-h-screen bg-background-light dark:bg-background-dark overflow-hidden relative selection:bg-accent/30 text-slate-900 dark:text-slate-50 font-sans"
+        >
+
+            {/* Noise Texture Overlay */}
+            <div className="absolute inset-0 z-0 bg-noise opacity-50 dark:opacity-40 mix-blend-overlay"></div>
 
             {/* Background Animated Shapes */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
                 <motion.div
                     animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.1, 0.2, 0.1],
-                        rotate: [0, 90, 0]
+                        scale: [1, 1.1, 1],
+                        opacity: [0.15, 0.25, 0.15],
+                        x: [0, 50, 0],
+                        y: [0, -50, 0]
                     }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-accent/20 blur-[120px]"
+                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                    className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-gradient-radial from-primary/30 to-transparent blur-[120px]"
                 />
                 <motion.div
                     animate={{
-                        scale: [1, 1.5, 1],
+                        scale: [1, 1.2, 1],
                         opacity: [0.1, 0.15, 0.1],
-                        rotate: [0, -90, 0]
+                        x: [0, -50, 0],
+                        y: [0, 50, 0]
                     }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute top-[40%] text-success -right-[10%] w-[40%] h-[40%] rounded-full bg-success/20 blur-[100px]"
+                    transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                    className="absolute top-[30%] -right-[15%] w-[50%] h-[50%] rounded-full bg-gradient-radial from-secondary/20 to-transparent blur-[120px]"
+                />
+                <motion.div
+                    animate={{
+                        scale: [1, 1.15, 1],
+                        opacity: [0.1, 0.2, 0.1],
+                        x: [0, 30, 0],
+                        y: [0, 40, 0]
+                    }}
+                    transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+                    className="absolute bottom-[-10%] left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-radial from-accent/20 to-transparent blur-[100px]"
                 />
             </div>
 
-            <nav className="relative z-10 flex items-center justify-between p-6 max-w-7xl mx-auto">
-                <div className="text-2xl font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-300">
-                    AllyVex
-                </div>
-                <div className="flex gap-4">
-                    <Link to="/dashboard" className="text-sm font-medium hover:text-accent transition-colors">
-                        Login
-                    </Link>
-                </div>
-            </nav>
-
-            <main className="relative z-10 max-w-7xl mx-auto px-6 pt-20 pb-32 flex flex-col items-center">
+            <main className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-32 flex flex-col items-center">
                 {/* Hero Section */}
-                <div className="text-center max-w-4xl mx-auto mb-20">
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="text-center max-w-4xl mx-auto mb-32 mt-10"
+                >
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/10 text-accent text-sm font-medium mb-8 border border-accent/20"
+                        className="animate-float inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 dark:bg-primary/10 text-blue-600 dark:text-secondary text-sm font-semibold mb-8 border border-blue-600/20 dark:border-secondary/20 shadow-[0_0_15px_rgba(59,130,246,0.15)] dark:shadow-[0_0_15px_rgba(0,245,212,0.15)] backdrop-blur-md"
                     >
-                        <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                        AllyVex v2.0 is live
+                        <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-secondary animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)] dark:shadow-[0_0_8px_rgba(0,245,212,0.8)]" />
+                        AllyVex Intelligence is Live
                     </motion.div>
 
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                        className="text-5xl md:text-7xl font-bold tracking-tight mb-6"
-                    >
-                        Beyond the <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-blue-400">Search Bar</span>
-                    </motion.h1>
+                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-tight text-slate-900 dark:text-white">
+                        Beyond the <motion.span
+                            className="bg-[length:200%_auto] animate-gradient text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-accent to-secondary drop-shadow-[0_0_20px_rgba(59,130,246,0.3)] dark:drop-shadow-[0_0_20px_rgba(0,245,212,0.3)]"
+                        >
+                            Search Bar
+                        </motion.span>
+                    </h1>
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto"
-                    >
-                        Autonomous Strategic Intelligence for B2B Sales. Stop researching, start closing.
-                    </motion.p>
+                    <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300/80 mb-10 max-w-2xl mx-auto font-light">
+                        Autonomous Strategic Intelligence for B2B Sales. Stop researching, start closing with our premium AI swarm.
+                    </p>
 
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="inline-block"
                     >
                         <Link
                             to="/setup"
-                            className="inline-flex items-center gap-2 bg-accent hover:bg-blue-600 text-white px-8 py-4 rounded-full font-medium text-lg shadow-[0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[0_0_40px_rgba(59,130,246,0.5)] transition-all"
+                            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-accent hover:from-accent hover:to-secondary text-white px-8 py-4 rounded-full font-semibold text-lg shadow-neon-purple hover:shadow-neon-cyan transition-all duration-300 border border-white/10"
                         >
-                            Start Intelligence
-                            <ChevronRight className="w-5 h-5" />
+                            Deploy Intelligence
+                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </Link>
                     </motion.div>
-                </div>
+                </motion.div>
 
                 {/* Feature Cards */}
-                <div className="grid md:grid-cols-3 gap-6 w-full mb-32">
+                <motion.div
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    variants={{
+                        visible: { transition: { staggerChildren: 0.15 } },
+                        hidden: {}
+                    }}
+                    className="grid md:grid-cols-3 gap-8 w-full mb-32 relative z-10"
+                >
                     {features.map((feature, idx) => (
                         <motion.div
                             key={idx}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: idx * 0.1 + 0.4 }}
-                            whileHover={{ y: -5 }}
-                            className="glass p-8 rounded-2xl border border-slate-200/50 dark:border-slate-700/50"
+                            variants={{
+                                hidden: { opacity: 0, y: 30 },
+                                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+                            }}
+                            whileHover={{ y: -8, scale: 1.02 }}
+                            className="glass-card p-8 rounded-3xl border border-white/10 hover:border-accent/40 shadow-sm hover:shadow-neon-purple transition-all duration-500 overflow-hidden relative group bg-white/60 dark:bg-[#150E28]/60"
                         >
-                            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-6">
-                                {feature.icon}
+                            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 to-secondary/5 dark:from-primary/5 dark:to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                            <div className="w-14 h-14 rounded-2xl bg-white/80 dark:bg-[#0F0A1F]/50 flex items-center justify-center mb-6 border border-white/20 dark:border-white/10 group-hover:border-blue-500/30 dark:group-hover:border-secondary/30 group-hover:shadow-neon-cyan transition-all duration-500 relative z-10 shadow-sm">
+                                {React.cloneElement(feature.icon, { className: 'w-7 h-7 text-blue-600 dark:text-secondary' })}
                             </div>
-                            <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
-                            <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
+                            <h3 className="text-2xl font-semibold mb-3 tracking-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-secondary dark:group-hover:from-accent dark:group-hover:to-secondary transition-all relative z-10 text-slate-800 dark:text-white">{feature.title}</h3>
+                            <p className="text-slate-600 dark:text-slate-400 font-light leading-relaxed relative z-10 group-hover:text-slate-700 dark:group-hover:text-slate-300">
                                 {feature.description}
                             </p>
                         </motion.div>
                     ))}
-                </div>
+                </motion.div>
 
                 {/* Multi-Agent System Section */}
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    className="w-full max-w-5xl text-center"
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="w-full max-w-5xl text-center relative z-10"
                 >
-                    <h2 className="text-3xl font-bold mb-4">Powered by Multi-Agent Swarms</h2>
-                    <p className="text-slate-600 dark:text-slate-400 mb-12 max-w-2xl mx-auto">
-                        Our specialized AI agents work in parallel to uncover, verify, and synthesize intelligence.
+                    <h2 className="text-3xl md:text-5xl font-bold mb-6 tracking-tight text-slate-900 dark:text-white">Powered by Multi-Agent Swarms</h2>
+                    <p className="text-slate-600 dark:text-slate-400 font-light mb-12 max-w-2xl mx-auto text-lg leading-relaxed">
+                        Our specialized AI agents work in absolute parallel to uncover, verify, and synthesize intelligence faster than ever thought possible.
                     </p>
 
                     <div className="flex flex-wrap justify-center gap-6">
@@ -153,19 +170,20 @@ export default function LandingPage() {
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: agent.delay, type: "spring" }}
-                                className="flex items-center gap-3 glass px-6 py-4 rounded-full border border-slate-200/50 dark:border-slate-700/50"
+                                transition={{ delay: agent.delay, type: "spring", stiffness: 100 }}
+                                whileHover={{ scale: 1.05, y: -2 }}
+                                className="flex items-center gap-3 glass-card bg-white/80 dark:bg-[#150E28]/50 px-6 py-4 rounded-full border border-white/20 dark:border-white/5 hover:border-blue-500/40 dark:hover:border-secondary/40 hover:shadow-neon-cyan transition-all duration-300 cursor-default group"
                             >
-                                <div className="text-accent">
-                                    {agent.icon}
+                                <div className="text-blue-600 dark:text-accent group-hover:text-blue-500 dark:group-hover:text-secondary transition-colors duration-300">
+                                    {React.cloneElement(agent.icon, { className: 'w-5 h-5' })}
                                 </div>
-                                <span className="font-medium">{agent.name}</span>
+                                <span className="font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors duration-300">{agent.name}</span>
                             </motion.div>
                         ))}
                     </div>
                 </motion.div>
 
             </main>
-        </div>
+        </motion.div>
     );
 }
