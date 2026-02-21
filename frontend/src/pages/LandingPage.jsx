@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Brain, Shield, Zap, Search, Globe, MessageSquare } from 'lucide-react';
+import Hero3D from '../components/Hero3D';
 
 const features = [
     {
@@ -101,59 +102,70 @@ export default function LandingPage() {
             </div>
 
             <main className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-32 flex flex-col items-center">
-                {/* Hero Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="text-center max-w-4xl mx-auto mb-32 mt-10"
-                >
+                {/* Hero Section Container */}
+                <div className="relative w-full mb-32 mt-10 flex flex-col lg:flex-row items-center justify-between min-h-[60vh]">
+
+                    {/* Left Content (Text & Buttons) */}
                     <motion.div
-                        className="animate-float inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 dark:bg-primary/10 text-blue-600 dark:text-secondary text-sm font-semibold mb-8 border border-blue-600/20 dark:border-secondary/20 shadow-[0_0_15px_rgba(59,130,246,0.15)] dark:shadow-[0_0_15px_rgba(0,245,212,0.15)] backdrop-blur-md"
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        className="text-left max-w-3xl relative z-10"
                     >
-                        <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-secondary animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)] dark:shadow-[0_0_8px_rgba(0,245,212,0.8)]" />
-                        AllyVex Intelligence is Live
+                        <motion.div
+                            className="animate-float inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 dark:bg-primary/10 text-blue-600 dark:text-secondary text-sm font-semibold mb-8 border border-blue-600/20 dark:border-secondary/20 shadow-[0_0_15px_rgba(59,130,246,0.15)] dark:shadow-[0_0_15px_rgba(0,245,212,0.15)] backdrop-blur-md"
+                        >
+                            <span className="w-2 h-2 rounded-full bg-blue-600 dark:bg-secondary animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)] dark:shadow-[0_0_8px_rgba(0,245,212,0.8)]" />
+                            AllyVex Intelligence is Live
+                        </motion.div>
+
+                        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-tight text-slate-900 dark:text-white">
+                            Beyond the <motion.span
+                                className="bg-[length:200%_auto] animate-gradient text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-accent to-secondary drop-shadow-[0_0_20px_rgba(59,130,246,0.3)] dark:drop-shadow-[0_0_20px_rgba(0,245,212,0.3)]"
+                            >
+                                Search Bar
+                            </motion.span>
+                        </h1>
+
+                        <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300/80 mb-10 max-w-xl font-light">
+                            Autonomous Strategic Intelligence for B2B Sales. Stop researching, start closing with our premium AI swarm.
+                        </p>
+
+                        <div className="flex flex-col sm:flex-row items-start sm:justify-start gap-4">
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="w-full sm:w-auto"
+                            >
+                                <Link
+                                    to="/register"
+                                    className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-accent hover:from-accent hover:to-secondary text-white px-8 py-4 rounded-full font-semibold text-lg shadow-neon-purple hover:shadow-neon-cyan transition-all duration-300 border border-white/10 w-full sm:w-auto"
+                                >
+                                    Register Your Company
+                                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            </motion.div>
+
+                            <motion.div
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                className="w-full sm:w-auto"
+                            >
+                                <Link
+                                    to="/login"
+                                    className="inline-flex items-center justify-center gap-2 bg-slate-900/5 dark:bg-white/5 hover:bg-slate-900/10 dark:hover:bg-white/10 text-slate-900 dark:text-white px-8 py-4 rounded-full font-semibold text-lg backdrop-blur-md transition-all duration-300 border border-slate-900/10 dark:border-white/20 hover:border-slate-900/20 dark:hover:border-white/40 shadow-sm w-full sm:w-auto"
+                                >
+                                    Login
+                                </Link>
+                            </motion.div>
+                        </div>
                     </motion.div>
 
-                    <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter mb-6 leading-tight text-slate-900 dark:text-white">
-                        Beyond the <motion.span
-                            className="bg-[length:200%_auto] animate-gradient text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-accent to-secondary drop-shadow-[0_0_20px_rgba(59,130,246,0.3)] dark:drop-shadow-[0_0_20px_rgba(0,245,212,0.3)]"
-                        >
-                            Search Bar
-                        </motion.span>
-                    </h1>
-
-                    <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-300/80 mb-10 max-w-2xl mx-auto font-light">
-                        Autonomous Strategic Intelligence for B2B Sales. Stop researching, start closing with our premium AI swarm.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <Link
-                                to="/register"
-                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-accent hover:from-accent hover:to-secondary text-white px-8 py-4 rounded-full font-semibold text-lg shadow-neon-purple hover:shadow-neon-cyan transition-all duration-300 border border-white/10 w-full sm:w-auto"
-                            >
-                                Register Your Company
-                                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                        </motion.div>
-
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            <Link
-                                to="/login"
-                                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-semibold text-lg backdrop-blur-md transition-all duration-300 border border-white/20 hover:border-white/40 shadow-sm w-full sm:w-auto"
-                            >
-                                Login
-                            </Link>
-                        </motion.div>
+                    {/* Right 3D Scene */}
+                    <div className="absolute right-[-5%] top-1/2 -translate-y-1/2 w-[55%] h-[800px] pointer-events-none hidden lg:flex items-center justify-center z-0">
+                        <Hero3D />
                     </div>
-                </motion.div>
+                </div>
 
                 {/* Feature Cards */}
                 <motion.div
