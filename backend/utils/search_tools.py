@@ -5,11 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
-def web_search(query: str, max_results: int = 5) -> str:
-    """
-    Searches the web using Tavily and returns formatted results
-    as a plain string to inject into model prompts.
-    """
+def web_search(query: str, max_results: int = 3) -> str:
     try:
         response = tavily_client.search(
             query=query,
@@ -22,9 +18,11 @@ def web_search(query: str, max_results: int = 5) -> str:
 
         formatted = ""
         for i, r in enumerate(results, 1):
-            formatted += f"\n[{i}] {r.get('title', 'No title')}\n"
+            # Truncate content to 200 characters per result
+            content = r.get('content', '')[:200]
+            formatted += f"\n[{i}] {r.get('title', '')}\n"
             formatted += f"    URL: {r.get('url', '')}\n"
-            formatted += f"    {r.get('content', '')}\n"
+            formatted += f"    {content}\n"
 
         return formatted.strip()
 
@@ -33,12 +31,8 @@ def web_search(query: str, max_results: int = 5) -> str:
 
 
 def multi_search(queries: list[str]) -> str:
-    """
-    Runs multiple searches and combines all results.
-    Use this when an agent needs to cover multiple angles.
-    """
     all_results = ""
     for query in queries:
-        all_results += f"\n\n=== Search: {query} ===\n"
-        all_results += web_search(query)
+        all_results += f"\n=== {query} ===\n"
+        all_results += web_search(query, max_results=2)  # Reduced to 2 per query
     return all_results.strip()

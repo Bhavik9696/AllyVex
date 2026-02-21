@@ -1,17 +1,13 @@
 import os
 import json
-from openai import OpenAI
+from groq import Groq
 from dotenv import load_dotenv
 from utils.parser import parse_json
 from utils.search_tools import web_search
 
 load_dotenv()
 
-# Cerebras uses OpenAI-compatible API
-client = OpenAI(
-    api_key=os.getenv("CEREBRAS_API_KEY"),
-    base_url="https://api.cerebras.ai/v1"
-)
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 DETECTIVE_SYSTEM_PROMPT = """
 You are the Detective Agent inside an autonomous B2B sales intelligence system called ALLYVEX.
@@ -88,13 +84,14 @@ def run_detective_agent(
 
     # Search for one critical piece of missing context
     gap_results = web_search(
-        f"{company_name} recent news leadership technology strategy 2025"
+        f"{company_name} latest news 2025",
+        max_results=2
     )
 
     print(f"  [DETECTIVE] Reasoning over all evidence...")
 
     response = client.chat.completions.create(
-        model="llama3.1-70b",
+        model="llama-3.3-70b-versatile",
         messages=[
             {"role": "system", "content": DETECTIVE_SYSTEM_PROMPT},
             {

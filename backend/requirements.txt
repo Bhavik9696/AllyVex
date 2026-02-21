@@ -1,0 +1,9 @@
+anthropic
+fastapi
+uvicorn
+python-dotenv
+pydantic
+groq
+openai
+tavily-python
+

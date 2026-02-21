@@ -6,12 +6,14 @@ from agents.orchestrator import run_orchestrator_agent
 import asyncio
 
 async def run_war_room(domain: str):
-    company_name = domain\\
-        .replace("www.", "")\\
-        .split(".")[0]\\
-        .replace("-", " ")\\
-        .title()
-
+    company_name = (
+            domain
+            .replace("www.", "")
+            .split(".")[0]
+            .replace("-", " ")
+            .replace("_", " ")
+            .title()
+        )
     yield {"phase": "BULL_START", "message": f"Bull Agent building case FOR {company_name}..."}
     bull_output = run_bull_agent(domain, company_name)
     yield {"phase": "BULL_DONE", "data": bull_output}
