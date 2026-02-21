@@ -7,7 +7,7 @@ export default function LoginPage() {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        navigate('/dashboard');
+        navigate('/kyc');
     };
 
     return (

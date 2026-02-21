@@ -7,7 +7,7 @@ export default function RegisterPage() {
 
     const handleRegister = (e) => {
         e.preventDefault();
-        navigate('/setup');
+        navigate('/login');
     };
 
     return (

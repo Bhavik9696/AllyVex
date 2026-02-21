@@ -127,19 +127,32 @@ export default function LandingPage() {
                         Autonomous Strategic Intelligence for B2B Sales. Stop researching, start closing with our premium AI swarm.
                     </p>
 
-                    <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="inline-block"
-                    >
-                        <Link
-                            to="/setup"
-                            className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-accent hover:from-accent hover:to-secondary text-white px-8 py-4 rounded-full font-semibold text-lg shadow-neon-purple hover:shadow-neon-cyan transition-all duration-300 border border-white/10"
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
                         >
-                            Deploy Intelligence
-                            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                    </motion.div>
+                            <Link
+                                to="/register"
+                                className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-accent hover:from-accent hover:to-secondary text-white px-8 py-4 rounded-full font-semibold text-lg shadow-neon-purple hover:shadow-neon-cyan transition-all duration-300 border border-white/10 w-full sm:w-auto"
+                            >
+                                Register Your Company
+                                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </Link>
+                        </motion.div>
+
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <Link
+                                to="/login"
+                                className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-semibold text-lg backdrop-blur-md transition-all duration-300 border border-white/20 hover:border-white/40 shadow-sm w-full sm:w-auto"
+                            >
+                                Login
+                            </Link>
+                        </motion.div>
+                    </div>
                 </motion.div>
 
                 {/* Feature Cards */}

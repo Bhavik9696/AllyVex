@@ -1,126 +1,126 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Search, ArrowRight, Clock, Star, TrendingUp, AlertTriangle } from 'lucide-react';
+import { ArrowRight, Activity, Users, Globe, Target, Building2, Calendar, Zap, Rocket, TrendingUp } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const recentSearches = [
-    { id: 1, company: 'Stripe.com', verdict: 'Strong', confidence: 94, date: '2 hours ago', icon: Star, color: 'text-success', bg: 'bg-success/10 border-success/20' },
-    { id: 2, company: 'AcmeCorp.io', verdict: 'Medium', confidence: 68, date: '5 hours ago', icon: TrendingUp, color: 'text-warning', bg: 'bg-warning/10 border-warning/20' },
-    { id: 3, company: 'LegacyTech.net', verdict: 'Weak', confidence: 82, date: '1 day ago', icon: AlertTriangle, color: 'text-danger', bg: 'bg-danger/10 border-danger/20' },
-    { id: 4, company: 'Vercel.com', verdict: 'Strong', confidence: 91, date: '2 days ago', icon: Star, color: 'text-success', bg: 'bg-success/10 border-success/20' },
+const metrics = [
+    { title: 'Total ICP Matches', value: '1,284', icon: Target, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+    { title: 'Active Markets', value: '4 Regions', icon: Globe, color: 'text-success', bg: 'bg-success/10' },
+    { title: 'Total Engagements', value: '342', icon: Activity, color: 'text-warning', bg: 'bg-warning/10' },
+    { title: 'Pipeline Value', value: '$4.2M', icon: TrendingUp, color: 'text-accent', bg: 'bg-accent/10' },
+];
+
+const recentEvents = [
+    { title: 'New Product Launch: Auto-Scoring API', date: 'Oct 24, 2023', type: 'Product' },
+    { title: 'Expanded into EMEA Market via London Office', date: 'Sep 12, 2023', type: 'Expansion' },
+    { title: 'Series A Funding Round Closed ($12M)', date: 'Aug 05, 2023', type: 'Funding' },
 ];
 
 export default function DashboardPage() {
-    const [domain, setDomain] = useState('');
-    const [isFocused, setIsFocused] = useState(false);
     const navigate = useNavigate();
-
-    const handleSearch = (e) => {
-        e.preventDefault();
-        if (domain) {
-            // Simulate navigate to analysis
-            navigate(`/analysis/${encodeURIComponent(domain)}`);
-        }
-    };
-
     return (
         <div className="max-w-6xl mx-auto w-full pb-12">
 
-            {/* Header & Search */}
-            <div className="mb-12 pt-8">
-                <h1 className="text-3xl font-bold mb-2">Welcome back, Alex</h1>
-                <p className="text-slate-500 dark:text-slate-400 mb-8">Ready to analyze your next prospect?</p>
+            {/* Header & Global CTA */}
+            <div className="mb-12 pt-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
+                <div>
+                    <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+                        <Building2 className="w-8 h-8 text-blue-500" />
+                        Company Internal Overview
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400">Manage your company profile and review operational metrics.</p>
+                </div>
 
-                <form onSubmit={handleSearch} className="relative max-w-2xl">
-                    <motion.div
-                        animate={{
-                            boxShadow: isFocused
-                                ? '0 0 0 2px rgba(59,130,246,0.5), 0 10px 30px -10px rgba(59,130,246,0.3)'
-                                : '0 4px 6px -1px rgba(0,0,0,0.05)'
-                        }}
-                        className="flex items-center glass-card overflow-hidden transition-all duration-300"
+                <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                >
+                    <button
+                        onClick={() => navigate('/intelligence')}
+                        className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-accent hover:from-accent hover:to-secondary text-white px-8 py-4 rounded-xl font-bold text-lg shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_25px_rgba(0,245,212,0.5)] transition-all duration-300 border border-white/10"
                     >
-                        <div className="pl-5 text-slate-400">
-                            <Search className="w-5 h-5" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder="Enter Company Domain (e.g. stripe.com)"
-                            value={domain}
-                            onChange={(e) => setDomain(e.target.value)}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            className="w-full bg-transparent px-4 py-4 focus:outline-none text-lg"
-                        />
-                        <button
-                            type="submit"
-                            disabled={!domain}
-                            className={`px-6 py-4 flex items-center gap-2 font-medium transition-colors ${domain ? 'bg-accent text-white hover:bg-blue-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
-                                }`}
-                        >
-                            Analyze
-                            <ArrowRight className="w-4 h-4" />
-                        </button>
-                    </motion.div>
-                </form>
+                        <Zap className="w-5 h-5" />
+                        Deploy Strategic Intelligence
+                    </button>
+                </motion.div>
             </div>
 
-            {/* Recent Searches Header */}
-            <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-slate-400" />
-                    Recent Analyses
-                </h2>
-                <button className="text-sm text-accent hover:text-blue-600 font-medium">
-                    View all
-                </button>
-            </div>
-
-            {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {recentSearches.map((item, idx) => (
+            {/* Metrics Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                {metrics.map((item, idx) => (
                     <motion.div
-                        key={item.id}
+                        key={idx}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.1 }}
-                        whileHover={{ y: -4, scale: 1.02 }}
-                        onClick={() => navigate(`/analysis/${item.id}`)}
-                        className="glass-card p-5 cursor-pointer relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] dark:hover:shadow-[0_8px_30px_rgba(59,130,246,0.1)] transition-all"
+                        className="glass-card p-6 flex flex-col justify-between overflow-hidden relative group"
                     >
                         <div className="flex justify-between items-start mb-4">
-                            <div className="font-semibold text-lg truncate pr-2">{item.company}</div>
-                            <div className={`p-1.5 rounded-md border ${item.bg}`}>
-                                <item.icon className={`w-4 h-4 ${item.color}`} />
+                            <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400">{item.title}</h3>
+                            <div className={`p-2 rounded-lg ${item.bg}`}>
+                                <item.icon className={`w-5 h-5 ${item.color}`} />
                             </div>
                         </div>
-
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-slate-500 dark:text-slate-400">Verdict</span>
-                                <span className={`text-sm font-semibold ${item.color}`}>{item.verdict}</span>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm text-slate-500 dark:text-slate-400">Confidence</span>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                        <div
-                                            className={`h-full ${item.confidence > 80 ? 'bg-success' : item.confidence > 60 ? 'bg-warning' : 'bg-danger'}`}
-                                            style={{ width: `${item.confidence}%` }}
-                                        />
-                                    </div>
-                                    <span className="text-sm font-medium">{item.confidence}%</span>
-                                </div>
-                            </div>
-
-                            <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 flex items-center justify-between">
-                                {item.date}
-                                <ArrowRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-accent" transform="translate(-4,0) group-hover:translate(0,0)" />
-                            </div>
+                        <div className="text-3xl font-bold text-slate-800 dark:text-white">
+                            {item.value}
                         </div>
                     </motion.div>
                 ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Services Summary */}
+                <div className="glass-card p-8">
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
+                        <Rocket className="w-5 h-5 text-accent" />
+                        Core Services Summary
+                    </h2>
+                    <ul className="space-y-4">
+                        <li className="flex gap-3">
+                            <span className="w-1.5 h-1.5 rounded-full bg-accent mt-2 shrink-0" />
+                            <div>
+                                <h4 className="font-semibold text-slate-800 dark:text-slate-200">Enterprise Cloud Security Architecture</h4>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Full-stack security audits and Zero-Trust implementations for Fortune 500s.</p>
+                            </div>
+                        </li>
+                        <li className="flex gap-3">
+                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 shrink-0" />
+                            <div>
+                                <h4 className="font-semibold text-slate-800 dark:text-slate-200">Data Privacy & Compliance Governance</h4>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Automated GDPR/CCPA readiness frameworks and continuous monitoring.</p>
+                            </div>
+                        </li>
+                        <li className="flex gap-3">
+                            <span className="w-1.5 h-1.5 rounded-full bg-success mt-2 shrink-0" />
+                            <div>
+                                <h4 className="font-semibold text-slate-800 dark:text-slate-200">Managed Threat Intelligence</h4>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">24/7 proactive threat hunting and automated incident response integration.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                {/* Recent Operational Events */}
+                <div className="glass-card p-8">
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-slate-800 dark:text-white">
+                        <Calendar className="w-5 h-5 text-warning" />
+                        Recent Operational Events
+                    </h2>
+                    <div className="space-y-6 relative before:absolute before:inset-0 before:ml-2 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-slate-200 dark:before:from-slate-700 before:to-transparent">
+                        {recentEvents.map((event, idx) => (
+                            <div key={idx} className="relative pl-8">
+                                <div className="absolute left-0 top-1 w-4 h-4 rounded-full bg-white dark:bg-[#0F0A1F] border-2 border-warning z-10" />
+                                <h4 className="font-semibold text-slate-800 dark:text-slate-200">{event.title}</h4>
+                                <div className="flex items-center gap-3 mt-1.5">
+                                    <span className="text-xs font-medium text-slate-500">{event.date}</span>
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                                        {event.type}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
 
         </div>

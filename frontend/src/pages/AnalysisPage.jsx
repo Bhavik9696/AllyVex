@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, ChevronDown, Copy, Activity, Zap, TrendingUp, AlertTriangle, MessageSquare, Globe, Target } from 'lucide-react';
+import { CheckCircle2, ChevronDown, Copy, Activity, Zap, TrendingUp, AlertTriangle, MessageSquare, Globe, Target, Search, ArrowRight } from 'lucide-react';
 
 const agentTrace = [
     { id: 1, name: 'Web Scraper', status: 'completed', details: 'Crawled 45 pages across domain and news sources.' },
@@ -43,8 +43,9 @@ const CircularProgress = ({ value }) => {
 };
 
 export default function AnalysisPage() {
-    const { id } = useParams();
-    const domain = id || 'Stripe.com';
+    const [domainInput, setDomainInput] = useState('');
+    const [activeDomain, setActiveDomain] = useState('Stripe.com');
+    const [isFocused, setIsFocused] = useState(false);
 
     const [openAccordion, setOpenAccordion] = useState(0);
     const [copied, setCopied] = useState(false);
@@ -57,14 +58,63 @@ export default function AnalysisPage() {
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (domainInput) {
+            setActiveDomain(domainInput);
+            setDomainInput(''); // Clear input after search
+        }
+    };
+
     return (
         <div className="max-w-6xl mx-auto w-full pb-12 pt-4">
+
+            {/* Run Analysis Search Bar */}
+            <div className="mb-12 glass-card p-6">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                    <Target className="w-5 h-5 text-accent" />
+                    Target Intelligence Console
+                </h2>
+                <form onSubmit={handleSearch} className="relative w-full max-w-3xl">
+                    <motion.div
+                        animate={{
+                            boxShadow: isFocused
+                                ? '0 0 0 2px rgba(59,130,246,0.5), 0 10px 30px -10px rgba(59,130,246,0.3)'
+                                : '0 4px 6px -1px rgba(0,0,0,0.05)'
+                        }}
+                        className="flex items-center bg-white/5 dark:bg-[#0F0A1F]/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden transition-all duration-300"
+                    >
+                        <div className="pl-5 text-slate-400">
+                            <Search className="w-5 h-5" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Enter Target Company Domain (e.g. stripe.com)"
+                            value={domainInput}
+                            onChange={(e) => setDomainInput(e.target.value)}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                            className="w-full bg-transparent px-4 py-4 focus:outline-none text-lg dark:text-white"
+                        />
+                        <button
+                            type="submit"
+                            disabled={!domainInput}
+                            className={`px-8 py-4 flex items-center gap-2 font-bold transition-all ${domainInput ? 'bg-gradient-to-r from-blue-600 to-accent text-white hover:opacity-90' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 cursor-not-allowed'
+                                }`}
+                        >
+                            Analyze
+                            <ArrowRight className="w-4 h-4" />
+                        </button>
+                    </motion.div>
+                </form>
+            </div>
+
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-10 pt-4 border-t border-slate-200/50 dark:border-slate-800/50">
                 <div>
-                    <h1 className="text-3xl font-bold flex items-center gap-3">
-                        <Globe className="w-8 h-8 text-accent" />
-                        {domain}
+                    <h1 className="text-4xl font-black flex items-center gap-3 tracking-tight">
+                        <Globe className="w-8 h-8 text-blue-500" />
+                        {activeDomain}
                     </h1>
                     <div className="flex items-center gap-3 mt-3">
                         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-accent/10 border border-accent/20 text-accent flex items-center gap-1.5"><Target className="w-3 h-3" /> Target Match: High</span>

@@ -4,19 +4,20 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronLeft, CheckCircle2 } from 'lucide-react';
 
 const steps = [
-    { id: 'company', title: 'Company Details', fields: ['Company Name', 'Industry'] },
-    { id: 'services', title: 'Services & Offering', fields: ['Services Offered (comma separated)'] },
-    { id: 'target', title: 'Target Market', fields: ['Target ICP', 'Deal Size Range'] }
+    { id: 'services', title: 'Services & Industries', fields: ['Services Offered', 'Target Industries'] },
+    { id: 'target', title: 'Market & Deal Size', fields: ['Ideal Customer Size', 'Deal Size Range'] },
+    { id: 'regions', title: 'Regions & Contacts', fields: ['Regions Targeted', 'Decision Makers'] }
 ];
 
 export default function KYCSetupPage() {
     const [currentStep, setCurrentStep] = useState(0);
     const [formData, setFormData] = useState({
-        companyName: '',
-        industry: '',
         services: '',
-        icp: '',
-        dealSize: ''
+        industries: '',
+        customerSize: '',
+        dealSize: '',
+        regions: '',
+        decisionMakers: ''
     });
     const navigate = useNavigate();
 
@@ -25,7 +26,7 @@ export default function KYCSetupPage() {
             setCurrentStep(prev => prev + 1);
         } else {
             // Submit and redirect
-            navigate('/dashboard');
+            navigate('/company');
         }
     };
 
@@ -79,25 +80,25 @@ export default function KYCSetupPage() {
                                 {currentStep === 0 && (
                                     <>
                                         <div>
-                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Company Name</label>
-                                            <input
-                                                type="text"
-                                                name="companyName"
-                                                value={formData.companyName}
+                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Services Offered</label>
+                                            <textarea
+                                                rows="2"
+                                                name="services"
+                                                value={formData.services}
                                                 onChange={handleChange}
-                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
-                                                placeholder="e.g. Acme Corp"
+                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all resize-none text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                                                placeholder="e.g. Cloud Security, Data Privacy Consulting"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Industry</label>
+                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Target Industries</label>
                                             <input
                                                 type="text"
-                                                name="industry"
-                                                value={formData.industry}
+                                                name="industries"
+                                                value={formData.industries}
                                                 onChange={handleChange}
-                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
-                                                placeholder="e.g. Enterprise Software"
+                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                                                placeholder="e.g. Finance, Healthcare, B2B SaaS"
                                             />
                                         </div>
                                     </>
@@ -106,31 +107,18 @@ export default function KYCSetupPage() {
                                 {currentStep === 1 && (
                                     <>
                                         <div>
-                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Services Offered</label>
-                                            <textarea
-                                                rows="3"
-                                                name="services"
-                                                value={formData.services}
+                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Ideal Customer Size</label>
+                                            <select
+                                                name="customerSize"
+                                                value={formData.customerSize}
                                                 onChange={handleChange}
-                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all resize-none"
-                                                placeholder="e.g. Cloud Security, Data Privacy Consulting"
-                                            />
-                                        </div>
-                                    </>
-                                )}
-
-                                {currentStep === 2 && (
-                                    <>
-                                        <div>
-                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Target ICP (Ideal Customer Profile)</label>
-                                            <input
-                                                type="text"
-                                                name="icp"
-                                                value={formData.icp}
-                                                onChange={handleChange}
-                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all"
-                                                placeholder="e.g. VP Engineering at Fortune 500"
-                                            />
+                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-slate-800 dark:text-slate-100"
+                                            >
+                                                <option value="" disabled>Select company size</option>
+                                                <option value="startup">Startup (1-50 employees)</option>
+                                                <option value="midmarket">Mid-Market (51-500 employees)</option>
+                                                <option value="enterprise">Enterprise (500+ employees)</option>
+                                            </select>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Deal Size Range</label>
@@ -149,6 +137,33 @@ export default function KYCSetupPage() {
                                         </div>
                                     </>
                                 )}
+
+                                {currentStep === 2 && (
+                                    <>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Regions Targeted</label>
+                                            <input
+                                                type="text"
+                                                name="regions"
+                                                value={formData.regions}
+                                                onChange={handleChange}
+                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                                                placeholder="e.g. North America, Western Europe"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Decision Makers</label>
+                                            <input
+                                                type="text"
+                                                name="decisionMakers"
+                                                value={formData.decisionMakers}
+                                                onChange={handleChange}
+                                                className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent transition-all text-slate-800 dark:text-slate-100 placeholder-slate-400"
+                                                placeholder="e.g. VP Engineering, CISO"
+                                            />
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </motion.div>
                     </AnimatePresence>
@@ -159,8 +174,8 @@ export default function KYCSetupPage() {
                             onClick={handleBack}
                             disabled={currentStep === 0}
                             className={`flex items-center gap-2 px-4 py-2 font-medium rounded-lg transition-colors ${currentStep === 0
-                                    ? 'opacity-0 pointer-events-none'
-                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                ? 'opacity-0 pointer-events-none'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                 }`}
                         >
                             <ChevronLeft className="w-4 h-4" />

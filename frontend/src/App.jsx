@@ -29,13 +29,12 @@ function AnimatedRoutes() {
                 </Route>
 
                 {/* Setup Flow */}
-                <Route path="/setup" element={<KYCSetupPage />} />
+                <Route path="/kyc" element={<KYCSetupPage />} />
 
                 {/* Dashboard Routes with Sidebar/TopNav */}
                 <Route element={<AppLayout />}>
-                    <Route path="/dashboard" element={<DashboardPage />} />
-                    <Route path="/analysis/:id" element={<AnalysisPage />} />
-                    <Route path="/analysis/new" element={<DashboardPage />} />
+                    <Route path="/company" element={<DashboardPage />} />
+                    <Route path="/intelligence" element={<AnalysisPage />} />
                 </Route>
             </Routes>
         </AnimatePresence>

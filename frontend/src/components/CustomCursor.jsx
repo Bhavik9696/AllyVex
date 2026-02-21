@@ -47,11 +47,11 @@ export default function CustomCursor() {
 
             {/* Glowing Outer Aura (Cursor Glow) */}
             <motion.div
-                className="fixed top-0 left-0 w-16 h-16 rounded-full bg-[#00F5D4]/40 pointer-events-none z-[100] blur-xl mix-blend-screen"
+                className="fixed top-0 left-0 w-80 h-80 rounded-full bg-[#00F5D4]/20 pointer-events-none z-[100] blur-[100px] mix-blend-screen"
                 animate={{
-                    x: mousePosition.x - 32,
-                    y: mousePosition.y - 32,
-                    scale: isHovering ? 2 : 1,
+                    x: mousePosition.x - 160,
+                    y: mousePosition.y - 160,
+                    scale: isHovering ? 1.5 : 1,
                 }}
                 transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.5 }}
             />
