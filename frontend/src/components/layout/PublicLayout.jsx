@@ -6,9 +6,8 @@ import ParticleBackground from '../ParticleBackground';
 
 export default function PublicLayout() {
     return (
-        <div className="min-h-screen bg-[#0F172A] font-sans text-white overflow-hidden selection:bg-[#3B82F6]/30 cursor-none relative">
+        <div className="min-h-screen bg-background-light dark:bg-[#0F0A1F] font-sans text-slate-900 dark:text-white overflow-hidden selection:bg-[#3B82F6]/30 relative transition-colors duration-300">
             <CustomCursor />
-            <ParticleBackground />
             <Navbar />
             <main className="relative z-10">
                 <Outlet />

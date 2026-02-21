@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Brain, Shield, Zap, Search, Globe, MessageSquare } from 'lucide-react';
@@ -29,17 +29,27 @@ const agents = [
 ];
 
 export default function LandingPage() {
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            // Normalize mouse position between -1 and 1
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = (e.clientY / window.innerHeight) * 2 - 1;
+            setMousePos({ x, y });
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.3 } }}
             transition={{ duration: 0.8 }}
-            className="min-h-screen bg-background-light dark:bg-background-dark overflow-hidden relative selection:bg-accent/30 text-slate-900 dark:text-slate-50 font-sans"
+            className="min-h-screen bg-transparent overflow-hidden relative selection:bg-accent/30 text-slate-900 dark:text-slate-50 font-sans"
         >
-
-            {/* Noise Texture Overlay */}
-            <div className="absolute inset-0 z-0 bg-noise opacity-50 dark:opacity-40 mix-blend-overlay"></div>
 
             {/* Background Animated Shapes */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -47,30 +57,45 @@ export default function LandingPage() {
                     animate={{
                         scale: [1, 1.1, 1],
                         opacity: [0.15, 0.25, 0.15],
-                        x: [0, 50, 0],
-                        y: [0, -50, 0]
+                        x: mousePos.x * -60,
+                        y: mousePos.y * -60
                     }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                        scale: { duration: 25, repeat: Infinity, ease: "linear" },
+                        opacity: { duration: 25, repeat: Infinity, ease: "linear" },
+                        x: { type: "spring", stiffness: 50, damping: 20 },
+                        y: { type: "spring", stiffness: 50, damping: 20 }
+                    }}
                     className="absolute -top-[20%] -left-[10%] w-[60%] h-[60%] rounded-full bg-gradient-radial from-primary/30 to-transparent blur-[120px]"
                 />
                 <motion.div
                     animate={{
                         scale: [1, 1.2, 1],
                         opacity: [0.1, 0.15, 0.1],
-                        x: [0, -50, 0],
-                        y: [0, 50, 0]
+                        x: mousePos.x * 40,
+                        y: mousePos.y * 40
                     }}
-                    transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                        scale: { duration: 30, repeat: Infinity, ease: "linear" },
+                        opacity: { duration: 30, repeat: Infinity, ease: "linear" },
+                        x: { type: "spring", stiffness: 40, damping: 20 },
+                        y: { type: "spring", stiffness: 40, damping: 20 }
+                    }}
                     className="absolute top-[30%] -right-[15%] w-[50%] h-[50%] rounded-full bg-gradient-radial from-secondary/20 to-transparent blur-[120px]"
                 />
                 <motion.div
                     animate={{
                         scale: [1, 1.15, 1],
                         opacity: [0.1, 0.2, 0.1],
-                        x: [0, 30, 0],
-                        y: [0, 40, 0]
+                        x: mousePos.x * -80,
+                        y: mousePos.y * -80
                     }}
-                    transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
+                    transition={{
+                        scale: { duration: 35, repeat: Infinity, ease: "linear" },
+                        opacity: { duration: 35, repeat: Infinity, ease: "linear" },
+                        x: { type: "spring", stiffness: 30, damping: 20 },
+                        y: { type: "spring", stiffness: 30, damping: 20 }
+                    }}
                     className="absolute bottom-[-10%] left-[10%] w-[50%] h-[50%] rounded-full bg-gradient-radial from-accent/20 to-transparent blur-[100px]"
                 />
             </div>

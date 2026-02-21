@@ -20,6 +20,7 @@ export default function ParticleBackground() {
                 },
                 fpsLimit: 60,
                 interactivity: {
+                    detectsOn: "window",
                     events: {
                         onClick: {
                             enable: true,
@@ -61,7 +62,7 @@ export default function ParticleBackground() {
                             default: "bounce",
                         },
                         random: true,
-                        speed: 0.5,
+                        speed: 1.5,
                         straight: false,
                     },
                     number: {
@@ -72,18 +73,18 @@ export default function ParticleBackground() {
                         value: 40,
                     },
                     opacity: {
-                        value: 0.3,
+                        value: 0.8,
                         animation: {
                             enable: true,
                             speed: 1,
-                            minimumValue: 0.1
+                            minimumValue: 0.3
                         }
                     },
                     shape: {
                         type: "circle",
                     },
                     size: {
-                        value: { min: 1, max: 3 },
+                        value: { min: 1, max: 4 },
                         animation: {
                             enable: true,
                             speed: 2,

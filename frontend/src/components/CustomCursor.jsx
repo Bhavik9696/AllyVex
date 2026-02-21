@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function CustomCursor() {
-    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [mousePosition, setMousePosition] = useState({ x: -1000, y: -1000 });
     const [isHovering, setIsHovering] = useState(false);
 
     useEffect(() => {
@@ -32,26 +32,28 @@ export default function CustomCursor() {
 
     return (
         <>
-            {/* Core Cursor Dot */}
+            {/* Massive Background Spotlight track */}
             <motion.div
-                className="fixed top-0 left-0 w-4 h-4 rounded-full bg-accent pointer-events-none z-[100] mix-blend-screen"
-                animate={{
-                    x: mousePosition.x - 8,
-                    y: mousePosition.y - 8,
-                    scale: isHovering ? 1.5 : 1,
+                className="fixed top-0 left-0 w-[1000px] h-[1000px] rounded-full pointer-events-none z-0 mix-blend-screen opacity-60"
+                style={{
+                    background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, rgba(0,245,212,0.05) 40%, transparent 70%)'
                 }}
-                transition={{ type: "spring", stiffness: 500, damping: 28, mass: 0.5 }}
+                animate={{
+                    x: mousePosition.x - 500,
+                    y: mousePosition.y - 500,
+                }}
+                transition={{ type: "tween", ease: "backOut", duration: 0.8 }}
             />
 
-            {/* Glowing Outer Aura */}
+            {/* Glowing Outer Aura (Cursor Glow) */}
             <motion.div
-                className="fixed top-0 left-0 w-32 h-32 rounded-full bg-secondary/20 pointer-events-none z-[99] blur-2xl mix-blend-screen"
+                className="fixed top-0 left-0 w-16 h-16 rounded-full bg-[#00F5D4]/40 pointer-events-none z-[100] blur-xl mix-blend-screen"
                 animate={{
-                    x: mousePosition.x - 64,
-                    y: mousePosition.y - 64,
-                    scale: isHovering ? 1.5 : 1,
+                    x: mousePosition.x - 32,
+                    y: mousePosition.y - 32,
+                    scale: isHovering ? 2 : 1,
                 }}
-                transition={{ type: "spring", stiffness: 250, damping: 35, mass: 0.8 }}
+                transition={{ type: "spring", stiffness: 400, damping: 28, mass: 0.5 }}
             />
         </>
     );
