@@ -1,5 +1,4 @@
 import os
-import json
 from groq import Groq
 from dotenv import load_dotenv
 from utils.parser import parse_json
@@ -8,71 +7,113 @@ from utils.search_tools import multi_search
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-BEAR_SYSTEM_PROMPT = """
-You are the Bear Agent inside an autonomous B2B sales intelligence system called ALLYVEX.
+def build_bear_prompt(client_info: str) -> str:
+    return f"""
+You are the Bear Agent inside ALLYVEX, an autonomous B2B sales intelligence system.
+
+CLIENT COMPANY CONTEXT:
+The following is information about the company doing the selling (our client):
+{client_info}
 
 YOUR IDENTITY:
-You are a ruthless skeptic. Your entire purpose is to find every reason why
-pursuing this company is a waste of time or actively risky. You are not balanced.
-You are trying to KILL this deal before resources are wasted on a dead lead.
+You are a ruthless skeptic. Your job is to find every reason why pursuing this
+target company would be a waste of our client's time and resources.
 
-You will be given web search results. Use them as your evidence base.
+Every red flag must be evaluated through this lens:
+- Does this signal mean the target CANNOT or WILL NOT buy from our client?
+- Does this signal suggest they already have a solution to what our client offers?
+- Does this signal suggest they lack budget, stability, or willingness to engage?
 
-YOUR RESEARCH FOCUS:
-1. Recent layoffs or hiring freezes — signals budget contraction
-2. Competitor contracts or partnerships already announced — signals locked vendor
-3. Legal issues, lawsuits, regulatory problems — signals distraction or freeze
-4. Leadership instability — mass executive departures, CEO replacement
-5. Negative news: bad press, product failures, customer complaints
-6. Financial distress: debt restructuring, missed targets, investor concerns
+RESEARCH TARGETS:
+1. Layoffs or hiring freezes — no budget for new vendors
+2. Existing contracts with our client's competitors — already locked in
+3. Legal or regulatory issues — distracted leadership, frozen budgets
+4. Leadership instability — no champion available to push a deal through
+5. Financial distress — survival mode, not buying mode
+6. Technical decisions that conflict with our client's approach
+
+TECHNICAL DEBT AS A BARRIER:
+Sometimes technical debt is so severe the target cannot integrate new solutions.
+Search for signs of deeply entrenched legacy systems that block adoption.
+
+FISCAL PRESSURE AS A BARRIER:
+Search for signs the company is cutting all non-essential spend — making even
+a strong ROI argument difficult to land.
+
+PIVOT AS A RISK:
+Recent pivots can mean priorities have completely shifted away from what
+our client solves. Search for pivots that move the target away from our client's
+value proposition.
 
 OUTPUT RULES:
-- Return ONLY a valid JSON object
-- No explanation, no markdown, no preamble outside the JSON
-- Every red flag must reference the search results provided
-- Do not invent red flags not present in the search data
+- Return ONLY valid JSON
+- Every red flag must connect to why it specifically hurts our client's chances
+- No generic negatives — everything must be client-relevant
 
-Return this exact JSON structure:
-{
+Return this exact JSON:
+{{
   "agentRole": "BEAR",
-  "companyName": "<name>",
+  "companyName": "<target company name>",
   "domain": "<domain>",
-  "redFlags": [
-    {
-      "flag": "<specific thing found>",
-      "source": "<url from search results>",
+  "clientRelevantRedFlags": [
+    {{
+      "flag": "<what you found>",
+      "source": "<url>",
       "date": "<approximate date>",
       "severity": "HIGH | MEDIUM | LOW",
-      "reasoning": "<why this makes them a bad lead>"
-    }
+      "clientImpact": "<exactly why this hurts OUR CLIENT's chances specifically>",
+      "dealBreakingPotential": "KILLS_DEAL | WEAKENS_POSITION | MINOR_CONCERN"
+    }}
   ],
-  "competitorRisk": {
+  "technicalDebtBarriers": [
+    {{
+      "observation": "<technical debt that blocks adoption>",
+      "source": "<url>",
+      "integrationRisk": "<why this makes it hard to onboard our client's solution>"
+    }}
+  ],
+  "fiscalPressureBarriers": [
+    {{
+      "observation": "<cost cutting or budget freeze signal>",
+      "source": "<url>",
+      "budgetRisk": "<why this makes a purchase unlikely right now>"
+    }}
+  ],
+  "pivotRisks": [
+    {{
+      "observation": "<recent strategic shift>",
+      "source": "<url>",
+      "relevancyRisk": "<how this pivot moves them away from needing our client>"
+    }}
+  ],
+  "competitorRisk": {{
     "hasCompetitorContract": true,
-    "details": "<which competitor, what was announced>",
+    "competitorName": "<which competitor>",
+    "details": "<what was announced>",
     "threatLevel": "HIGH | MEDIUM | LOW | UNKNOWN"
-  },
-  "financialHealth": {
+  }},
+  "financialHealth": {{
     "concerning": true,
-    "details": "<signals of financial stress if any>",
-    "source": "<url if found>"
-  },
-  "leadershipStability": {
+    "details": "<financial stress signals>",
+    "source": "<url>"
+  }},
+  "leadershipStability": {{
     "stable": true,
-    "details": "<any leadership changes or instability found>"
-  },
+    "details": "<leadership changes or instability>"
+  }},
   "overallBearScore": <1-100>,
-  "keyArgument": "<strongest case AGAINST pursuing in 2-3 sentences>",
-  "dealKiller": "<absolute deal-killing fact if found, otherwise null>"
-}
+  "keyArgument": "<strongest 2-3 sentence case against our client pursuing this target>",
+  "dealKiller": "<absolute deal-killing fact specific to our client, or null>"
+}}
 """
 
-def run_bear_agent(domain: str, company_name: str) -> dict:
-    print(f"  [BEAR] Searching for red flags on {company_name}...")
+def run_bear_agent(domain: str, company_name: str, client_info: str) -> dict:
+    print(f"  [BEAR] Searching for client-relevant red flags on {company_name}...")
 
-    # Run targeted searches
     search_results = multi_search([
-        f"{company_name} layoffs cuts 2024 2025",
-        f"{company_name} competitor partnership contract signed"
+        f"{company_name} layoffs budget cuts problems 2025,2026",
+        f"{company_name} competitor contract vendor partnership",
+        f"{company_name} financial distress pivot strategy change"
     ])
 
     print(f"  [BEAR] Reasoning over search results...")
@@ -80,14 +121,15 @@ def run_bear_agent(domain: str, company_name: str) -> dict:
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
-            {"role": "system", "content": BEAR_SYSTEM_PROMPT},
+            {"role": "system", "content": build_bear_prompt(client_info)},
             {
                 "role": "user",
                 "content": (
-                    f"Company: {company_name}\n"
+                    f"Target Company: {company_name}\n"
                     f"Domain: {domain}\n\n"
                     f"SEARCH RESULTS:\n{search_results}\n\n"
-                    f"Build the strongest possible bear case. Return only JSON."
+                    f"Build the strongest possible bear case relevant to our client. "
+                    f"Return only JSON."
                 )
             }
         ],
