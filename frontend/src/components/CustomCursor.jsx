@@ -34,9 +34,9 @@ export default function CustomCursor() {
         <>
             {/* Massive Background Spotlight track */}
             <motion.div
-                className="fixed top-0 left-0 w-[1000px] h-[1000px] rounded-full pointer-events-none z-0 mix-blend-screen opacity-60"
+                className="fixed top-0 left-0 w-[1000px] h-[1000px] rounded-full pointer-events-none z-0 mix-blend-screen opacity-70"
                 style={{
-                    background: 'radial-gradient(circle, rgba(124,58,237,0.12) 0%, rgba(0,245,212,0.05) 40%, transparent 70%)'
+                    background: 'radial-gradient(circle, rgba(250,204,21,0.18) 0%, rgba(24,24,27,0.8) 45%, transparent 70%)'
                 }}
                 animate={{
                     x: mousePosition.x - 500,
@@ -47,7 +47,7 @@ export default function CustomCursor() {
 
             {/* Glowing Outer Aura (Cursor Glow) */}
             <motion.div
-                className="fixed top-0 left-0 w-80 h-80 rounded-full bg-[#00F5D4]/20 pointer-events-none z-[100] blur-[100px] mix-blend-screen"
+                className="fixed top-0 left-0 w-80 h-80 rounded-full bg-[#FACC15]/18 pointer-events-none z-[100] blur-[110px] mix-blend-screen"
                 animate={{
                     x: mousePosition.x - 160,
                     y: mousePosition.y - 160,

@@ -9,16 +9,16 @@ export default {
     extend: {
       colors: {
         background: {
-          light: '#F8FAFC',
-          dark: '#0F0A1F',
+          light: '#0b0b0f',
+          dark: '#050509',
         },
         card: {
-          light: '#FFFFFF',
-          dark: '#150E28',
+          light: 'rgba(15,15,20,0.85)',
+          dark: 'rgba(10,10,15,0.9)',
         },
-        accent: '#7C3AED',
-        primary: '#5B21B6',
-        secondary: '#00F5D4',
+        accent: '#FACC15',
+        primary: '#D97706',
+        secondary: '#FBBF24',
         success: '#22C55E',
         warning: '#FACC15',
         danger: '#EF4444',
@@ -27,10 +27,10 @@ export default {
         sans: ['Inter', 'sans-serif'],
       },
       boxShadow: {
-        'glass-light': '0 8px 32px rgba(0, 0, 0, 0.05)',
-        'glass-dark': '0 8px 32px rgba(0, 0, 0, 0.4)',
-        'neon-cyan': '0 0 30px rgba(0, 245, 212, 0.5)',
-        'neon-purple': '0 0 30px rgba(124, 58, 237, 0.5)',
+        'glass-light': '0 18px 60px rgba(0, 0, 0, 0.45)',
+        'glass-dark': '0 24px 80px rgba(0, 0, 0, 0.85)',
+        'neon-cyan': '0 0 40px rgba(250, 204, 21, 0.3)',
+        'neon-purple': '0 0 40px rgba(217, 119, 6, 0.4)',
       },
       animation: {
         'gradient': 'gradient 8s linear infinite',
