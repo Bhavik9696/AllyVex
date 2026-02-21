@@ -69,7 +69,6 @@ def run_bull_agent(domain: str, company_name: str) -> dict:
     search_results = multi_search([
         f"{company_name} funding round 2024 2025",
         f"{company_name} hiring engineers jobs",
-        f"{company_name} product launch expansion news"
     ])
 
     print(f"  [BULL] Reasoning over search results...")

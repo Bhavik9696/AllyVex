@@ -72,7 +72,6 @@ def run_bear_agent(domain: str, company_name: str) -> dict:
     # Run targeted searches
     search_results = multi_search([
         f"{company_name} layoffs cuts 2024 2025",
-        f"{company_name} problems controversy lawsuit",
         f"{company_name} competitor partnership contract signed"
     ])
 
