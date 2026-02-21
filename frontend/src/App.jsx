@@ -1,54 +1,28 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { ThemeProvider } from './context/ThemeContext';
-import { AnimatePresence } from 'framer-motion';
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import AppLayout from './components/layout/AppLayout';
-import PublicLayout from './components/layout/PublicLayout';
+const LandingPage = lazy(() => import("./pages/LandingPage"));
+const WarRoom = lazy(() => import("./pages/WarRoom"));
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
 
-import LandingPage from './pages/LandingPage';
-import AboutPage from './pages/About';
-import LoginPage from './pages/Login';
-import RegisterPage from './pages/Register';
-import KYCSetupPage from './pages/KYCSetupPage';
-import DashboardPage from './pages/DashboardPage';
-import AnalysisPage from './pages/AnalysisPage';
-
-function AnimatedRoutes() {
-    const location = useLocation();
-
-    return (
-        <AnimatePresence mode="wait">
-            <Routes location={location} key={location.pathname}>
-                {/* Public Routes with Navbar */}
-                <Route element={<PublicLayout />}>
-                    <Route path="/" element={<LandingPage />} />
-                    <Route path="/about" element={<AboutPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
-                </Route>
-
-                {/* Setup Flow */}
-                <Route path="/kyc" element={<KYCSetupPage />} />
-
-                {/* Dashboard Routes with Sidebar/TopNav */}
-                <Route element={<AppLayout />}>
-                    <Route path="/company" element={<DashboardPage />} />
-                    <Route path="/intelligence" element={<AnalysisPage />} />
-                </Route>
-            </Routes>
-        </AnimatePresence>
-    );
+export default function App() {
+  return (
+    <Router>
+      <Suspense
+        fallback={
+          <div className="h-screen flex items-center justify-center">
+            Loading...
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/war-room" element={<WarRoom />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+        </Routes>
+      </Suspense>
+    </Router>
+  );
 }
-
-function App() {
-    return (
-        <ThemeProvider>
-            <BrowserRouter>
-                <AnimatedRoutes />
-            </BrowserRouter>
-        </ThemeProvider>
-    );
-}
-
-export default App;

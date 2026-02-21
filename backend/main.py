@@ -7,6 +7,9 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 from orchestration.war_room import run_war_room
 from utils.doc_generator import generate_client_info
+from motor.motor_asyncio import AsyncIOMotorClient
+from passlib.context import CryptContext
+from pydantic import EmailStr
 
 load_dotenv()
 
@@ -18,9 +21,13 @@ app = FastAPI(title="ALLYVEX API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
 )
 
 class GenerateProfileRequest(BaseModel):
@@ -116,3 +123,93 @@ async def download_file(filename: str):
         media_type=media_type,
         filename=safe_name
     )
+
+
+# ========================
+# MONGODB SETUP (ADDED)
+# ========================
+
+MONGO_URL = os.getenv("MONGO_URL")
+
+client = AsyncIOMotorClient(MONGO_URL)
+db = client["allyvex"]
+users_collection = db["users"]
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+
+# ========================
+# AUTH MODELS (ADDED)
+# ========================
+
+class RegisterRequest(BaseModel):
+    company: str
+    email: EmailStr
+    password: str
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+
+# ========================
+# PASSWORD HELPERS (ADDED)
+# ========================
+
+def hash_password(password: str):
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+
+
+# ========================
+# REGISTER API (ADDED)
+# ========================
+
+@app.post("/api/register")
+async def register(request: RegisterRequest):
+    existing_user = await users_collection.find_one({"email": request.email})
+
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    hashed_pw = hash_password(request.password)
+
+    await users_collection.insert_one({
+        "company": request.company,
+        "email": request.email,
+        "password": hashed_pw
+    })
+
+    return {"message": "User registered successfully"}
+
+
+
+# ========================
+# LOGIN API (ADDED)
+# ========================
+
+@app.post("/api/login")
+async def login(request: LoginRequest):
+    user = await users_collection.find_one({"email": request.email})
+
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+
+    if not verify_password(request.password, user["password"]):
+        raise HTTPException(status_code=400, detail="Invalid credentials")
+
+    return {
+        "message": "Login successful",
+        "email": user["email"],
+        "company": user["company"]
+    }
+
+
+
+
+
