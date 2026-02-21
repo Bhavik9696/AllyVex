@@ -67,12 +67,10 @@ export default function AnalysisPage() {
         setTargetData(null);
         setAnalysisStage('Agent swarm deploying...');
 
-        // Emulate stage updates
-        setTimeout(() => setAnalysisStage('Extracting signals and analyzing tech debt...'), 1200);
-        setTimeout(() => setAnalysisStage('Generating dossier and strategy...'), 2400);
-
         try {
-            const data = await runTargetAnalysis(domain);
+            const data = await runTargetAnalysis(domain, (stage) => {
+                setAnalysisStage(stage);
+            });
             setTargetData(data);
         } catch (e) {
             console.error(e);

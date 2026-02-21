@@ -10,7 +10,7 @@
   }
 
   body {
-    @apply bg-background-light text-slate-800 transition-colors duration-300 antialiased font-sans;
+    @apply bg-background-dark text-slate-100 transition-colors duration-300 antialiased font-sans;
   }
 
   .dark body {
@@ -20,19 +20,19 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-glass-light;
+    @apply bg-white/5 backdrop-blur-2xl border border-yellow-400/15 shadow-glass-dark;
   }
 
   .dark .glass {
-    @apply bg-[#150E28]/60 backdrop-blur-xl border border-white/10 shadow-glass-dark;
+    @apply bg-black/40 backdrop-blur-2xl border border-yellow-500/20 shadow-glass-dark;
   }
 
   .glass-card {
-    @apply bg-card-light/80 backdrop-blur-xl border border-slate-200/50 shadow-sm rounded-2xl transition-all;
+    @apply bg-card-light/80 backdrop-blur-2xl border border-yellow-500/10 shadow-glass-light rounded-2xl transition-all;
   }
 
   .dark .glass-card {
-    @apply bg-[#150E28]/70 backdrop-blur-xl border border-white/5 shadow-glass-dark rounded-2xl transition-all;
+    @apply bg-card-dark/90 backdrop-blur-2xl border border-yellow-500/15 shadow-glass-dark rounded-2xl transition-all;
   }
 
   /* Noise Overlay Utility */

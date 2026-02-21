@@ -15,9 +15,8 @@ export default function Hero3D() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
             style={{ y: yTransform, opacity: opacityTransform }}
-            className="relative w-full h-full flex items-center justify-center pointer-events-none"
+            className="relative w-full h-full flex items-center justify-center pointer-events-auto"
         >
-            {/* Subtle radial gradient glow behind the robot to add depth */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] bg-gradient-radial from-blue-600/10 via-accent/5 to-transparent blur-[60px] rounded-full z-0" />
 
             <iframe
@@ -28,10 +27,6 @@ export default function Hero3D() {
                 loading="lazy"
                 title="Interactive 3D Robot AI"
                 className="relative z-10 w-full h-full object-contain"
-                style={{
-                    // Explicitly pointer-events-none so it does not block the landing page UI interaction
-                    pointerEvents: 'none'
-                }}
             ></iframe>
         </motion.div>
     );
