@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-background-light text-slate-800 transition-colors duration-300 antialiased font-sans;
+  }
+  
+  .dark body {
+    @apply bg-background-dark text-slate-100;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-lg border border-white/20 shadow-glass-light;
+  }
+  
+  .dark .glass {
+    @apply bg-slate-800/50 backdrop-blur-lg border border-slate-700/50 shadow-glass-dark;
+  }
+
+  .glass-card {
+    @apply bg-card-light/80 backdrop-blur-md border border-slate-200/50 shadow-sm rounded-xl;
+  }
+
+  .dark .glass-card {
+    @apply bg-card-dark/80 backdrop-blur-md border border-slate-700/50 shadow-md rounded-xl;
+  }
+}
