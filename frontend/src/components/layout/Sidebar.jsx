@@ -5,10 +5,10 @@ import { LayoutDashboard, FileSearch, History, Settings, ChevronLeft, ChevronRig
 import { cn } from '../../lib/utils';
 
 const navItems = [
-    { path: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { path: '/analysis/new', icon: FileSearch, label: 'New Analysis' },
-    { path: '/dashboard', icon: History, label: 'Recent Searches' },
-    { path: '/dashboard', icon: Settings, label: 'Settings' },
+    { path: '/company', icon: LayoutDashboard, label: 'Dashboard' },
+    { path: '/intelligence', icon: FileSearch, label: 'New Analysis' },
+    { path: '/company', icon: History, label: 'Recent Searches' },
+    { path: '/company', icon: Settings, label: 'Settings' },
 ];
 
 export default function Sidebar() {
