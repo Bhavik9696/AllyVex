@@ -338,6 +338,79 @@ const TrackCard = ({ track, trackType, domain, onSendEmail }) => {
       setEmailSending(false);
     }
   };
+function ScoreRing({ score = 0, label = "", color = "#00f" }) {
+  const size = 88;
+  const stroke = 8;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
+
+  return (
+    <div style={{ position: "relative", width: size, height: size }}>
+      <svg width={size} height={size}>
+        {/* Background ring */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#0e1a26"
+          strokeWidth={stroke}
+          fill="none"
+        />
+
+        {/* Progress ring */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={color}
+          strokeWidth={stroke}
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      </svg>
+
+      {/* 🔥 CENTERED CONTENT */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          textAlign: "center",
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 22,
+            fontWeight: 700,
+            color: color,
+            lineHeight: 1,
+          }}
+        >
+          {score}
+        </div>
+
+        <div
+          style={{
+            fontSize: 10,
+            letterSpacing: 2,
+            color: "#5a7a90",
+            marginTop: 2,
+          }}
+        >
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
 
   const cfg = VERDICT_CONFIG[verdict] || VERDICT_CONFIG.AVOID;
 
@@ -420,9 +493,9 @@ const TrackCard = ({ track, trackType, domain, onSendEmail }) => {
                 {outreachEmail.body}
               </pre>
               <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 10 }}>
-                <Button onClick={handleSend} loading={emailSending} variant="ghost" style={{ fontSize: 11 }}>
+                {/* <Button onClick={handleSend} loading={emailSending} variant="ghost" style={{ fontSize: 11 }}>
                   SEND EMAIL ↗
-                </Button>
+                </Button> */}
                 {emailResult && (
                   <span style={{ fontSize: 11, color: emailResult.success ? "#00ff88" : "#ff3b5c" }}>
                     {emailResult.success ? `✓ Sent to ${emailResult.scraped_email}` : `✗ ${emailResult.error}`}
