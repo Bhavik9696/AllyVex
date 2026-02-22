@@ -1,23 +1,208 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  createContext,
+  useContext,
+} from "react";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const BASE_URL = "http://localhost:8000";
 
-const VERDICT_CONFIG = {
-  PURSUE: {
-    color: "#f5c842",
-    bg: "rgba(245,200,66,0.1)",
-    border: "rgba(245,200,66,0.35)",
+// ─── Responsive Hook ─────────────────────────────────────────────────────────
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
+  return isMobile;
+};
+
+// ─── Theme Context ────────────────────────────────────────────────────────────
+const ThemeContext = createContext(null);
+const useTheme = () => useContext(ThemeContext);
+
+const THEMES = {
+  gold: {
+    name: "gold",
+    // Primary accent
+    accent: "#f5c842",
+    accentDim: "rgba(245,200,66,0.6)",
+    accentGlow: "rgba(245,200,66,0.3)",
+    accentBg: "rgba(245,200,66,0.06)",
+    accentBg2: "rgba(245,200,66,0.1)",
+    accentBorder: "rgba(245,200,66,0.2)",
+    accentBorder2: "rgba(245,200,66,0.35)",
+    accentBorderStrong: "rgba(245,200,66,0.5)",
+    // Secondary
+    secondary: "#e8a020",
+    secondaryBg: "rgba(232,160,32,0.08)",
+    secondaryBorder: "rgba(232,160,32,0.2)",
+    tertiary: "#c9a227",
+    tertiaryBg: "rgba(201,162,39,0.08)",
+    // Danger
+    danger: "#ff4d6d",
+    dangerBg: "rgba(255,77,109,0.07)",
+    dangerBorder: "rgba(255,77,109,0.25)",
+    // Background
+    bg: "#080600",
+    bgDeep: "#080600",
+    bgCard: "rgba(18,13,4,0.65)",
+    bgCard2: "rgba(20,15,5,0.55)",
+    bgInput: "rgba(10,7,2,0.7)",
+    bgGlass: "rgba(30,20,5,0.6)",
+    bgNav: "rgba(8,6,0,0.75)",
+    bgOverlay: "rgba(6,4,0,0.6)",
+    bgButton: "rgba(245,200,66,0.04)",
+    // Text
+    textPrimary: "#e8d9b0",
+    textHeading: "#f0e8d0",
+    textBright: "#f0d878",
+    textMid: "#9a8660",
+    textDim: "#7a6840",
+    textFaint: "#5a4820",
+    textVeryFaint: "#3a2e18",
+    textDarkest: "#2a2010",
+    // Orb gradients
+    orbTop: "rgba(180,130,10,0.09)",
+    orbBottom: "rgba(200,140,10,0.06)",
+    radialHero:
+      "radial-gradient(ellipse at 50% 0%, rgba(40,28,4,0.8) 0%, #080600 60%)",
+    // Logo gradient
+    logoGradient: "linear-gradient(135deg, #b8860b, #f5c842, #c9a227)",
+    logoGradientBtn: "linear-gradient(135deg, #c9a227, #f5c842, #b8860b)",
+    logoColor: "#0d0900",
+    // Grid
+    gridColor: "rgba(245,200,66,0.018)",
+    // Scan line
+    scanColor: "rgba(245,200,66,0.7)",
+    // Scrollbar
+    scrollThumb: "rgba(245,200,66,0.2)",
+    // Selection
+    selectionBg: "rgba(245,200,66,0.25)",
+    selectionColor: "#ffd700",
+    // cursor inner
+    cursorInner: "#f5c842",
+    cursorGlow: "0 0 8px #f5c842, 0 0 20px rgba(245,200,66,0.5)",
+    // Agent colors
+    bull: "#f5c842",
+    bear: "#ff4d6d",
+    detective: "#e8a020",
+    orchestrator: "#c9a227",
+    // Verdicts
+    PURSUE: {
+      color: "#f5c842",
+      bg: "rgba(245,200,66,0.1)",
+      border: "rgba(245,200,66,0.35)",
+    },
+    HOLD: {
+      color: "#e8a020",
+      bg: "rgba(232,160,32,0.1)",
+      border: "rgba(232,160,32,0.35)",
+    },
+    AVOID: {
+      color: "#ff4d6d",
+      bg: "rgba(255,77,109,0.1)",
+      border: "rgba(255,77,109,0.35)",
+    },
+    // Toggle button
+    toggleBg: "rgba(245,200,66,0.08)",
+    toggleBorder: "rgba(245,200,66,0.25)",
+    toggleColor: "#f5c842",
+    toggleLabel: "NEBULA MODE",
+    toggleIcon: "◈",
   },
-  HOLD: {
-    color: "#e8a020",
-    bg: "rgba(232,160,32,0.1)",
-    border: "rgba(232,160,32,0.35)",
-  },
-  AVOID: {
-    color: "#ff4d6d",
-    bg: "rgba(255,77,109,0.1)",
-    border: "rgba(255,77,109,0.35)",
+  purple: {
+    name: "purple",
+    // Primary accent
+    accent: "#a78bfa",
+    accentDim: "rgba(167,139,250,0.6)",
+    accentGlow: "rgba(167,139,250,0.3)",
+    accentBg: "rgba(167,139,250,0.06)",
+    accentBg2: "rgba(167,139,250,0.1)",
+    accentBorder: "rgba(167,139,250,0.2)",
+    accentBorder2: "rgba(167,139,250,0.35)",
+    accentBorderStrong: "rgba(167,139,250,0.5)",
+    // Secondary
+    secondary: "#60a5fa",
+    secondaryBg: "rgba(96,165,250,0.08)",
+    secondaryBorder: "rgba(96,165,250,0.2)",
+    tertiary: "#818cf8",
+    tertiaryBg: "rgba(129,140,248,0.08)",
+    // Danger
+    danger: "#f472b6",
+    dangerBg: "rgba(244,114,182,0.07)",
+    dangerBorder: "rgba(244,114,182,0.25)",
+    // Background
+    bg: "#04020e",
+    bgDeep: "#04020e",
+    bgCard: "rgba(10,5,30,0.7)",
+    bgCard2: "rgba(12,6,28,0.6)",
+    bgInput: "rgba(6,3,18,0.75)",
+    bgGlass: "rgba(14,7,35,0.65)",
+    bgNav: "rgba(4,2,14,0.8)",
+    bgOverlay: "rgba(3,1,10,0.65)",
+    bgButton: "rgba(167,139,250,0.05)",
+    // Text
+    textPrimary: "#c4b5f4",
+    textHeading: "#e2d9f3",
+    textBright: "#c4b5f4",
+    textMid: "#7c6db0",
+    textDim: "#5e508a",
+    textFaint: "#3d3165",
+    textVeryFaint: "#2a2248",
+    textDarkest: "#1a1530",
+    // Orb gradients
+    orbTop: "rgba(88,28,220,0.12)",
+    orbBottom: "rgba(37,99,235,0.08)",
+    radialHero:
+      "radial-gradient(ellipse at 50% 0%, rgba(30,10,80,0.9) 0%, #04020e 60%)",
+    // Logo gradient
+    logoGradient: "linear-gradient(135deg, #6d28d9, #a78bfa, #818cf8)",
+    logoGradientBtn: "linear-gradient(135deg, #5b21b6, #a78bfa, #6d28d9)",
+    logoColor: "#e2d9f3",
+    // Grid
+    gridColor: "rgba(167,139,250,0.018)",
+    // Scan line
+    scanColor: "rgba(167,139,250,0.7)",
+    // Scrollbar
+    scrollThumb: "rgba(167,139,250,0.2)",
+    // Selection
+    selectionBg: "rgba(167,139,250,0.25)",
+    selectionColor: "#c4b5f4",
+    // cursor inner
+    cursorInner: "#a78bfa",
+    cursorGlow: "0 0 8px #a78bfa, 0 0 20px rgba(167,139,250,0.5)",
+    // Agent colors
+    bull: "#a78bfa",
+    bear: "#f472b6",
+    detective: "#60a5fa",
+    orchestrator: "#818cf8",
+    // Verdicts
+    PURSUE: {
+      color: "#a78bfa",
+      bg: "rgba(167,139,250,0.1)",
+      border: "rgba(167,139,250,0.35)",
+    },
+    HOLD: {
+      color: "#60a5fa",
+      bg: "rgba(96,165,250,0.1)",
+      border: "rgba(96,165,250,0.35)",
+    },
+    AVOID: {
+      color: "#f472b6",
+      bg: "rgba(244,114,182,0.1)",
+      border: "rgba(244,114,182,0.35)",
+    },
+    // Toggle button
+    toggleBg: "rgba(167,139,250,0.08)",
+    toggleBorder: "rgba(167,139,250,0.25)",
+    toggleColor: "#a78bfa",
+    toggleLabel: "GOLD MODE",
+    toggleIcon: "◆",
   },
 };
 
@@ -30,31 +215,33 @@ const APPROACH_LABELS = {
   NEITHER: "Neither",
 };
 
-// ─── Global Styles ────────────────────────────────────────────────────────────
-const STYLES = `
+// ─── Dynamic Global Styles ────────────────────────────────────────────────────
+const makeStyles = (t) => `
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800;900&display=swap');
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+  html { -webkit-text-size-adjust: 100%; }
+
   body {
-    background: #080600;
-    color: #e8d9b0;
+    background: ${t.bg};
+    color: ${t.textPrimary};
     font-family: 'IBM Plex Mono', monospace;
     min-height: 100vh;
     overflow-x: hidden;
     cursor: none;
+    transition: background 0.5s ease, color 0.5s ease;
   }
 
-  ::selection { background: rgba(245,200,66,0.25); color: #ffd700; }
+  ::selection { background: ${t.selectionBg}; color: ${t.selectionColor}; }
   ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: #080600; }
-  ::-webkit-scrollbar-thumb { background: rgba(245,200,66,0.2); border-radius: 2px; }
+  ::-webkit-scrollbar-track { background: ${t.bg}; }
+  ::-webkit-scrollbar-thumb { background: ${t.scrollThumb}; border-radius: 2px; }
 
-  /* ── Custom Cursor ── */
   #cursor-outer {
     position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
     width: 36px; height: 36px; border-radius: 50%;
-    border: 1.5px solid rgba(245,200,66,0.6);
+    border: 1.5px solid ${t.accentDim};
     transform: translate(-50%, -50%);
     transition: transform 0.12s ease, width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
     mix-blend-mode: screen;
@@ -62,20 +249,13 @@ const STYLES = `
   #cursor-inner {
     position: fixed; top: 0; left: 0; z-index: 10000; pointer-events: none;
     width: 6px; height: 6px; border-radius: 50%;
-    background: #f5c842;
+    background: ${t.accent};
     transform: translate(-50%, -50%);
     transition: transform 0.05s ease;
-    box-shadow: 0 0 8px #f5c842, 0 0 20px rgba(245,200,66,0.4);
-  }
-  body:has(button:hover) #cursor-outer,
-  body:has(a:hover) #cursor-outer,
-  body:has([data-hover]:hover) #cursor-outer {
-    width: 52px; height: 52px;
-    border-color: rgba(245,200,66,0.9);
+    box-shadow: ${t.cursorGlow};
   }
 
-  /* ── Keyframes ── */
-  @keyframes pulse-gold { 0%,100%{opacity:1} 50%{opacity:0.35} }
+  @keyframes pulse-accent { 0%,100%{opacity:1} 50%{opacity:0.35} }
   @keyframes orb-drift { 0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(40px,-30px) scale(1.06)} 66%{transform:translate(-25px,15px) scale(0.96)} }
   @keyframes orb-drift-2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-30px,25px)} }
   @keyframes grid-move { 0%{background-position:0 0} 100%{background-position:80px 80px} }
@@ -89,35 +269,36 @@ const STYLES = `
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
   @keyframes page-in { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   @keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
-  @keyframes gold-glow-pulse { 0%,100%{box-shadow:0 0 20px rgba(245,200,66,0.1)} 50%{box-shadow:0 0 40px rgba(245,200,66,0.25), 0 0 80px rgba(245,200,66,0.08)} }
+  @keyframes gold-glow-pulse { 0%,100%{box-shadow:0 0 20px ${t.accentBg}} 50%{box-shadow:0 0 40px ${t.accentGlow}, 0 0 80px ${t.accentBg}} }
+  @keyframes theme-switch { 0%{opacity:0;transform:scale(0.96)} 100%{opacity:1;transform:scale(1)} }
 
   .fade-in-up { animation: fade-in-up 0.4s ease forwards; }
   .thinking-appear { animation: thinking-appear 0.3s ease forwards; }
   .page-in { animation: page-in 0.45s ease forwards; }
+  .theme-transition { animation: theme-switch 0.4s ease forwards; }
 
-  /* ── Glass Card Base ── */
   .glass {
-    background: rgba(20,15,5,0.55);
+    background: ${t.bgCard2};
     backdrop-filter: blur(20px) saturate(140%);
     -webkit-backdrop-filter: blur(20px) saturate(140%);
-    border: 1px solid rgba(245,200,66,0.12);
+    border: 1px solid ${t.accentBorder};
     border-radius: 12px;
   }
   .glass-gold {
-    background: rgba(30,20,5,0.6);
+    background: ${t.bgGlass};
     backdrop-filter: blur(24px) saturate(150%);
     -webkit-backdrop-filter: blur(24px) saturate(150%);
-    border: 1px solid rgba(245,200,66,0.22);
+    border: 1px solid ${t.accentBorder2};
     border-radius: 12px;
+    position: relative;
   }
 
-  /* ── Buttons ── */
   .btn-primary {
-    background: linear-gradient(135deg, #c9a227, #f5c842, #b8860b);
+    background: ${t.logoGradientBtn};
     background-size: 200% 100%;
-    color: #0d0900;
+    color: ${t.logoColor};
     border: none;
-    padding: 14px 34px;
+    padding: 13px 28px;
     border-radius: 8px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
@@ -127,10 +308,12 @@ const STYLES = `
     transition: all 0.3s;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(245,200,66,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+    white-space: nowrap;
+    box-shadow: 0 4px 20px ${t.accentGlow}, inset 0 1px 0 rgba(255,255,255,0.15);
   }
   .btn-primary::before {
     content: '';
@@ -139,16 +322,13 @@ const STYLES = `
     background-size: 200% 100%;
     animation: shimmer 2.5s infinite;
   }
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(245,200,66,0.5), 0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
-  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 30px ${t.accentGlow}, 0 8px 24px rgba(0,0,0,0.4); }
 
   .btn-secondary {
-    background: rgba(245,200,66,0.06);
-    color: #f5c842;
-    border: 1px solid rgba(245,200,66,0.3);
-    padding: 14px 34px;
+    background: ${t.accentBg};
+    color: ${t.accent};
+    border: 1px solid ${t.accentBorder2};
+    padding: 13px 28px;
     border-radius: 8px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
@@ -158,132 +338,176 @@ const STYLES = `
     transition: all 0.3s;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+    white-space: nowrap;
     backdrop-filter: blur(10px);
   }
-  .btn-secondary:hover {
-    background: rgba(245,200,66,0.12);
-    border-color: rgba(245,200,66,0.6);
-    transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(245,200,66,0.15);
-  }
+  .btn-secondary:hover { background: ${t.accentBg2}; border-color: ${t.accentBorderStrong}; transform: translateY(-2px); }
 
   .btn-ghost {
     background: rgba(255,255,255,0.03);
-    color: #9a8660;
+    color: ${t.textDim};
     border: 1px solid rgba(255,255,255,0.07);
-    padding: 14px 34px;
+    padding: 13px 28px;
     border-radius: 8px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 12px;
     letter-spacing: 2px;
     cursor: none;
     transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
     backdrop-filter: blur(10px);
   }
-  .btn-ghost:hover { background: rgba(245,200,66,0.05); color: #d4b870; border-color: rgba(245,200,66,0.2); }
+  .btn-ghost:hover { background: ${t.accentBg}; color: ${t.textMid}; border-color: ${t.accentBorder2}; }
 
-  /* ── Feature Cards ── */
   .feature-card {
-    background: rgba(20,14,4,0.6);
+    background: ${t.bgCard};
     backdrop-filter: blur(20px) saturate(130%);
     -webkit-backdrop-filter: blur(20px) saturate(130%);
-    border: 1px solid rgba(245,200,66,0.1);
+    border: 1px solid ${t.accentBorder};
     border-radius: 16px;
-    padding: 32px;
+    padding: 28px;
     transition: all 0.35s;
     cursor: none;
     position: relative;
     overflow: hidden;
   }
   .feature-card::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 30% 0%, rgba(245,200,66,0.06), transparent 60%);
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 0%, ${t.accentBg}, transparent 60%);
     opacity: 0; transition: opacity 0.35s;
   }
   .feature-card::after {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(245,200,66,0.4), transparent);
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, ${t.accentBorder2}, transparent);
     opacity: 0; transition: opacity 0.35s;
   }
   .feature-card:hover::before, .feature-card:hover::after { opacity: 1; }
-  .feature-card:hover {
-    border-color: rgba(245,200,66,0.25);
-    transform: translateY(-8px);
-    box-shadow: 0 32px 64px rgba(0,0,0,0.6), 0 0 1px rgba(245,200,66,0.3);
-  }
+  .feature-card:hover { border-color: ${t.accentBorder2}; transform: translateY(-6px); box-shadow: 0 24px 48px rgba(0,0,0,0.5); }
 
-  /* ── Agent Pills ── */
   .agent-pill {
-    display: flex; align-items: center; gap: 12px; padding: 14px 24px;
-    border-radius: 10px;
-    border: 1px solid rgba(245,200,66,0.1);
-    background: rgba(20,14,4,0.7);
-    backdrop-filter: blur(16px);
+    display: flex; align-items: center; gap: 10px; padding: 12px 20px;
+    border-radius: 10px; border: 1px solid ${t.accentBorder};
+    background: ${t.bgCard}; backdrop-filter: blur(16px);
     transition: all 0.25s; cursor: none;
   }
-  .agent-pill:hover {
-    border-color: rgba(245,200,66,0.35);
-    background: rgba(245,200,66,0.05);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 12px rgba(245,200,66,0.08);
-  }
+  .agent-pill:hover { border-color: ${t.accentBorder2}; background: ${t.accentBg}; transform: translateY(-2px); }
 
-  /* ── Stats ── */
   .stat-card {
-    padding: 28px 36px; text-align: center;
-    border-right: 1px solid rgba(245,200,66,0.1);
-    background: rgba(20,14,4,0.6);
-    backdrop-filter: blur(16px);
+    padding: 24px 28px; text-align: center;
+    border-right: 1px solid ${t.accentBorder};
+    background: ${t.bgCard}; backdrop-filter: blur(16px);
     transition: background 0.25s;
   }
-  .stat-card:hover { background: rgba(245,200,66,0.04); }
+  .stat-card:hover { background: ${t.accentBg}; }
   .stat-card:last-child { border-right: none; }
 
-  /* ── Nav Links ── */
   .nav-link {
-    font-size: 11px; letter-spacing: 1.5px; color: #7a6840;
+    font-size: 11px; letter-spacing: 1.5px; color: ${t.textDim};
     cursor: none; transition: color 0.2s;
     font-family: 'IBM Plex Mono', monospace;
+    white-space: nowrap;
   }
-  .nav-link:hover { color: #f5c842; }
+  .nav-link:hover { color: ${t.accent}; }
 
-  /* ── Inputs ── */
   .input-field {
     width: 100%; padding: 13px 16px;
-    background: rgba(10,7,2,0.7);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(245,200,66,0.15);
-    border-radius: 8px; color: #e8d9b0;
+    background: ${t.bgInput}; backdrop-filter: blur(12px);
+    border: 1px solid ${t.accentBorder};
+    border-radius: 8px; color: ${t.textPrimary};
     font-family: 'IBM Plex Mono', monospace; font-size: 13px;
-    outline: none; transition: all 0.25s;
-    cursor: none;
+    outline: none; transition: all 0.25s; cursor: none;
+    -webkit-appearance: none;
   }
-  .input-field:focus {
-    border-color: rgba(245,200,66,0.5);
-    box-shadow: 0 0 0 3px rgba(245,200,66,0.07), 0 0 20px rgba(245,200,66,0.08);
-  }
-  .input-field::placeholder { color: #3a2e18; }
+  .input-field:focus { border-color: ${t.accentBorderStrong}; box-shadow: 0 0 0 3px ${t.accentBg}, 0 0 20px ${t.accentBg}; }
+  .input-field::placeholder { color: ${t.textVeryFaint}; }
 
-  /* ── War Card ── */
   .war-card {
-    background: rgba(18,13,4,0.65);
+    background: ${t.bgCard};
     backdrop-filter: blur(20px) saturate(130%);
     -webkit-backdrop-filter: blur(20px) saturate(130%);
-    border: 1px solid rgba(245,200,66,0.12);
+    border: 1px solid ${t.accentBorder};
     border-radius: 10px;
+    transition: border-color 0.5s ease, background 0.5s ease;
   }
 
-  /* ── Section Divider ── */
-  .section-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(245,200,66,0.2), transparent);
-  }
-
-  /* ── Gold Glow animation on cards ── */
+  .section-divider { height: 1px; background: linear-gradient(90deg, transparent, ${t.accentBorder2}, transparent); }
   .glow-card { animation: gold-glow-pulse 4s ease-in-out infinite; }
+
+  .theme-toggle {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 7px 14px; border-radius: 20px;
+    background: ${t.toggleBg}; border: 1px solid ${t.toggleBorder};
+    color: ${t.toggleColor};
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    font-weight: 600; letter-spacing: 1.5px;
+    cursor: none; transition: all 0.3s ease;
+    position: relative; overflow: hidden; white-space: nowrap;
+  }
+  .theme-toggle::before { content: ''; position: absolute; inset: 0; background: ${t.accentBg2}; opacity: 0; transition: opacity 0.3s; }
+  .theme-toggle:hover::before { opacity: 1; }
+  .theme-toggle:hover { border-color: ${t.accentBorderStrong}; box-shadow: 0 0 16px ${t.accentGlow}; transform: translateY(-1px); }
+
+  /* ─── Tablet (≤900px) ─────────────────────────────────── */
+  @media (max-width: 900px) {
+    .feature-card:hover { transform: none; box-shadow: none; }
+    .agent-pill:hover { transform: none; }
+    .btn-primary:hover, .btn-secondary:hover, .btn-ghost:hover { transform: none; }
+  }
+
+  /* ─── Mobile (≤768px) ────────────────────────────────── */
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    #cursor-outer, #cursor-inner { display: none; }
+
+    .btn-primary, .btn-secondary, .btn-ghost {
+      padding: 12px 20px; font-size: 11px; letter-spacing: 1px;
+    }
+
+    .feature-card { padding: 20px; border-radius: 12px; }
+    .agent-pill { padding: 10px 14px; gap: 8px; }
+
+    .stat-card {
+      padding: 16px 20px;
+      border-right: none;
+      border-bottom: 1px solid ${t.accentBorder};
+    }
+    .stat-card:last-child { border-bottom: none; }
+
+    .war-card { border-radius: 8px; }
+    .glass-gold { border-radius: 10px; }
+
+    .theme-toggle { padding: 6px 11px; font-size: 9px; letter-spacing: 1px; }
+    .nav-link { font-size: 10px; letter-spacing: 1px; }
+
+    .input-field { font-size: 16px; cursor: auto; }
+
+    /* Hide hero 3D visual on mobile — not enough space */
+    .hero-visual-wrapper { display: none !important; }
+  }
+
+  /* ─── Small mobile (≤480px) ──────────────────────────── */
+  @media (max-width: 480px) {
+    .btn-primary, .btn-secondary, .btn-ghost {
+      padding: 12px 16px; font-size: 10px; letter-spacing: 1px;
+      width: 100%; justify-content: center;
+    }
+
+    /* Prevent iOS zoom on input focus */
+    .input-field { font-size: 16px; }
+
+    .theme-toggle-label { display: none; }
+
+    .track-header { flex-direction: column !important; gap: 12px !important; }
+    .score-rings { flex-direction: row !important; gap: 8px !important; }
+
+    .war-card { border-radius: 6px; }
+    .feature-card { border-radius: 10px; }
+  }
 `;
 
 // ─── Custom Cursor Component ──────────────────────────────────────────────────
@@ -316,12 +540,10 @@ const Cursor = () => {
     };
     raf = requestAnimationFrame(loop);
 
-    // Scale on hover
     const onEnter = () => {
       if (outerRef.current) {
         outerRef.current.style.width = "56px";
         outerRef.current.style.height = "56px";
-        outerRef.current.style.borderColor = "rgba(245,200,66,0.9)";
       }
       if (innerRef.current) {
         innerRef.current.style.transform = "translate(-50%,-50%) scale(1.5)";
@@ -331,7 +553,6 @@ const Cursor = () => {
       if (outerRef.current) {
         outerRef.current.style.width = "36px";
         outerRef.current.style.height = "36px";
-        outerRef.current.style.borderColor = "rgba(245,200,66,0.6)";
       }
       if (innerRef.current) {
         innerRef.current.style.transform = "translate(-50%,-50%) scale(1)";
@@ -372,7 +593,7 @@ const Cursor = () => {
           width: 36,
           height: 36,
           borderRadius: "50%",
-          border: "1.5px solid rgba(245,200,66,0.6)",
+          border: "1.5px solid",
           transform: "translate(-50%,-50%)",
           transition: "width 0.2s,height 0.2s,border-color 0.2s",
           mixBlendMode: "screen",
@@ -390,9 +611,7 @@ const Cursor = () => {
           width: 6,
           height: 6,
           borderRadius: "50%",
-          background: "#f5c842",
           transform: "translate(-50%,-50%)",
-          boxShadow: "0 0 8px #f5c842, 0 0 20px rgba(245,200,66,0.5)",
           transition: "transform 0.1s",
         }}
       />
@@ -400,248 +619,629 @@ const Cursor = () => {
   );
 };
 
-// ─── Shared BG Layer ──────────────────────────────────────────────────────────
-const BgLayer = ({ mousePos }) => (
-  <>
-    {/* Deep base gradient */}
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: "none",
-        background:
-          "radial-gradient(ellipse at 50% 0%, rgba(40,28,4,0.8) 0%, #080600 60%)",
-      }}
-    />
-    {/* Grid */}
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: "none",
-        backgroundImage:
-          "linear-gradient(rgba(245,200,66,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(245,200,66,0.018) 1px,transparent 1px)",
-        backgroundSize: "80px 80px",
-        animation: "grid-move 30s linear infinite",
-      }}
-    />
-    {/* Gold orb top-left */}
-    <div
-      style={{
-        position: "fixed",
-        zIndex: 0,
-        pointerEvents: "none",
-        top: "-15%",
-        left: "-5%",
-        width: "55%",
-        height: "55%",
-        borderRadius: "50%",
-        background:
-          "radial-gradient(ellipse, rgba(180,130,10,0.09) 0%, transparent 65%)",
-        transform: mousePos
-          ? `translate(${mousePos.x * -40}px,${mousePos.y * -40}px)`
-          : "none",
-        transition: "transform 0.9s cubic-bezier(.25,.46,.45,.94)",
-        animation: "orb-drift 20s ease-in-out infinite",
-      }}
-    />
-    {/* Warm orb bottom-right */}
-    <div
-      style={{
-        position: "fixed",
-        zIndex: 0,
-        pointerEvents: "none",
-        bottom: "-15%",
-        right: "-5%",
-        width: "50%",
-        height: "50%",
-        borderRadius: "50%",
-        background:
-          "radial-gradient(ellipse, rgba(200,140,10,0.06) 0%, transparent 65%)",
-        transform: mousePos
-          ? `translate(${mousePos.x * 25}px,${mousePos.y * 25}px)`
-          : "none",
-        transition: "transform 0.9s cubic-bezier(.25,.46,.45,.94)",
-        animation: "orb-drift-2 25s ease-in-out infinite",
-      }}
-    />
-    {/* Noise grain texture overlay */}
-    <div
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 0,
-        pointerEvents: "none",
-        opacity: 0.025,
-        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-        backgroundSize: "200px 200px",
-      }}
-    />
-  </>
-);
-
-// ─── Global Nav ───────────────────────────────────────────────────────────────
-const Nav = ({ page, onNav, user }) => (
-  <nav
-    style={{
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 200,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "16px 48px",
-      background: "rgba(8,6,0,0.75)",
-      backdropFilter: "blur(24px) saturate(160%)",
-      WebkitBackdropFilter: "blur(24px) saturate(160%)",
-      borderBottom: "1px solid rgba(245,200,66,0.1)",
-      boxShadow: "0 1px 0 rgba(245,200,66,0.05), 0 4px 24px rgba(0,0,0,0.5)",
-    }}
-  >
-    <div
-      style={{ display: "flex", alignItems: "center", gap: 14, cursor: "none" }}
-      onClick={() => onNav("landing")}
+// ─── Theme Toggle Button ──────────────────────────────────────────────────────
+const ThemeToggle = ({ onToggle }) => {
+  const t = useTheme();
+  return (
+    <button
+      className="theme-toggle"
+      onClick={onToggle}
       data-hover
+      title={`Switch to ${t.toggleLabel}`}
     >
-      <div
-        style={{
-          width: 38,
-          height: 38,
-          borderRadius: 8,
-          background: "linear-gradient(135deg, #b8860b, #f5c842, #c9a227)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: "Syne, sans-serif",
-          fontWeight: 900,
-          fontSize: 19,
-          color: "#0d0900",
-          boxShadow:
-            "0 0 24px rgba(245,200,66,0.3), inset 0 1px 0 rgba(255,255,255,0.2)",
-        }}
-      >
-        A
-      </div>
+      <span style={{ fontSize: 13 }}>{t.toggleIcon}</span>
+      <span style={{ position: "relative", zIndex: 1 }}>{t.toggleLabel}</span>
+      {/* Animated pip */}
       <span
         style={{
-          fontFamily: "Syne, sans-serif",
-          fontWeight: 800,
-          fontSize: 18,
-          color: "#f0d878",
-          letterSpacing: 3,
-          textShadow: "0 0 20px rgba(245,200,66,0.3)",
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: t.accent,
+          display: "inline-block",
+          animation: "pulse-accent 2s ease infinite",
+          boxShadow: `0 0 8px ${t.accent}`,
+          position: "relative",
+          zIndex: 1,
+        }}
+      />
+    </button>
+  );
+};
+
+// ─── Shared BG Layer ──────────────────────────────────────────────────────────
+const BgLayer = ({ mousePos }) => {
+  const t = useTheme();
+  return (
+    <>
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+          background: t.radialHero,
+          transition: "background 0.6s ease",
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+          backgroundImage: `linear-gradient(${t.gridColor} 1px,transparent 1px),linear-gradient(90deg,${t.gridColor} 1px,transparent 1px)`,
+          backgroundSize: "80px 80px",
+          animation: "grid-move 30s linear infinite",
+          transition: "opacity 0.5s",
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          zIndex: 0,
+          pointerEvents: "none",
+          top: "-15%",
+          left: "-5%",
+          width: "55%",
+          height: "55%",
+          borderRadius: "50%",
+          background: `radial-gradient(ellipse, ${t.orbTop} 0%, transparent 65%)`,
+          transform: mousePos
+            ? `translate(${mousePos.x * -40}px,${mousePos.y * -40}px)`
+            : "none",
+          transition:
+            "transform 0.9s cubic-bezier(.25,.46,.45,.94), background 0.6s ease",
+          animation: "orb-drift 20s ease-in-out infinite",
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          zIndex: 0,
+          pointerEvents: "none",
+          bottom: "-15%",
+          right: "-5%",
+          width: "50%",
+          height: "50%",
+          borderRadius: "50%",
+          background: `radial-gradient(ellipse, ${t.orbBottom} 0%, transparent 65%)`,
+          transform: mousePos
+            ? `translate(${mousePos.x * 25}px,${mousePos.y * 25}px)`
+            : "none",
+          transition:
+            "transform 0.9s cubic-bezier(.25,.46,.45,.94), background 0.6s ease",
+          animation: "orb-drift-2 25s ease-in-out infinite",
+        }}
+      />
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+          opacity: 0.025,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+          backgroundSize: "200px 200px",
+        }}
+      />
+    </>
+  );
+};
+
+// ─── Global Nav ───────────────────────────────────────────────────────────────
+const Nav = ({ page, onNav, user, onToggleTheme }) => {
+  const t = useTheme();
+  const isMobile = useIsMobile();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const closeSidebar = () => setSidebarOpen(false);
+
+  const navItem = (label, onClick, accent = false) => (
+    <div
+      key={label}
+      onClick={() => {
+        onClick();
+        closeSidebar();
+      }}
+      data-hover
+      style={{
+        padding: "16px 24px",
+        fontSize: 12,
+        fontFamily: "IBM Plex Mono, monospace",
+        letterSpacing: 2,
+        fontWeight: accent ? 700 : 400,
+        color: accent ? t.logoColor : t.textMid,
+        background: accent ? t.logoGradientBtn : "transparent",
+        borderRadius: accent ? 8 : 0,
+        borderBottom: accent ? "none" : `1px solid ${t.accentBorder}`,
+        cursor: "pointer",
+        transition: "all 0.2s",
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        margin: accent ? "8px 16px" : 0,
+      }}
+    >
+      {label}
+    </div>
+  );
+
+  // Desktop nav
+  if (!isMobile) {
+    return (
+      <nav
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 200,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "16px 40px",
+          background: t.bgNav,
+          backdropFilter: "blur(24px) saturate(160%)",
+          WebkitBackdropFilter: "blur(24px) saturate(160%)",
+          borderBottom: `1px solid ${t.accentBorder}`,
+          boxShadow: `0 1px 0 ${t.accentBg}, 0 4px 24px rgba(0,0,0,0.5)`,
+          transition: "background 0.5s ease, border-color 0.5s ease",
+          minHeight: 70,
         }}
       >
-        ALLYVEX
-      </span>
-      <span style={{ fontSize: 9, color: "#4a3c1a", letterSpacing: 3 }}>
-        {page === "warroom" ? "WAR ROOM" : "INTELLIGENCE"}
-      </span>
-    </div>
-    <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-      {page === "landing" && (
-        <>
-          <span className="nav-link">FEATURES</span>
-          <span className="nav-link">HOW IT WORKS</span>
-          <span className="nav-link" onClick={() => onNav("login")}>
-            LOGIN
-          </span>
-          <button
-            onClick={() => onNav("register")}
-            className="btn-primary"
-            style={{ padding: "9px 22px", fontSize: 11 }}
-          >
-            GET ACCESS →
-          </button>
-        </>
-      )}
-      {page === "login" && (
-        <>
-          <span className="nav-link" onClick={() => onNav("landing")}>
-            ← HOME
-          </span>
-          <span className="nav-link" onClick={() => onNav("register")}>
-            REGISTER
-          </span>
-        </>
-      )}
-      {page === "register" && (
-        <>
-          <span className="nav-link" onClick={() => onNav("landing")}>
-            ← HOME
-          </span>
-          <span className="nav-link" onClick={() => onNav("login")}>
-            LOGIN
-          </span>
-        </>
-      )}
-      {page === "warroom" && (
-        <>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span
-              style={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                background: "#f5c842",
-                animation: "pulse-gold 2s ease infinite",
-                display: "inline-block",
-                boxShadow: "0 0 8px rgba(245,200,66,0.6)",
-              }}
-            />
-            <span style={{ fontSize: 10, color: "#7a6840", letterSpacing: 1 }}>
-              SYSTEM ONLINE
-            </span>
-          </div>
-          {user && (
-            <span style={{ fontSize: 11, color: "#7a6840" }}>{user}</span>
-          )}
-          <button
-            onClick={() => onNav("landing")}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+            cursor: "none",
+          }}
+          onClick={() => onNav("landing")}
+          data-hover
+        >
+          <div
             style={{
-              padding: "7px 16px",
-              borderRadius: 6,
-              fontFamily: "IBM Plex Mono",
-              fontSize: 10,
-              cursor: "none",
-              letterSpacing: 1,
-              background: "rgba(245,200,66,0.04)",
-              color: "#7a6840",
-              border: "1px solid rgba(245,200,66,0.15)",
-              transition: "all 0.2s",
+              width: 38,
+              height: 38,
+              borderRadius: 8,
+              background: t.logoGradient,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 900,
+              fontSize: 19,
+              color: t.logoColor,
+              boxShadow: `0 0 24px ${t.accentGlow}, inset 0 1px 0 rgba(255,255,255,0.2)`,
+              transition: "background 0.5s ease, box-shadow 0.5s ease",
             }}
           >
-            LOGOUT
+            A
+          </div>
+          <span
+            style={{
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 800,
+              fontSize: 18,
+              color: t.textBright,
+              letterSpacing: 3,
+              textShadow: `0 0 20px ${t.accentGlow}`,
+              transition: "color 0.5s ease, text-shadow 0.5s ease",
+            }}
+          >
+            ALLYVEX
+          </span>
+          <span
+            style={{
+              fontSize: 9,
+              color: t.textDarkest,
+              letterSpacing: 3,
+              transition: "color 0.5s",
+            }}
+          >
+            {page === "warroom" ? "WAR ROOM" : "INTELLIGENCE"}
+          </span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <ThemeToggle onToggle={onToggleTheme} />
+          {page === "landing" && (
+            <>
+              <span className="nav-link" onClick={() => onNav("login")}>
+                LOGIN
+              </span>
+              <button
+                onClick={() => onNav("register")}
+                className="btn-primary"
+                style={{ padding: "9px 22px", fontSize: 11 }}
+              >
+                GET ACCESS →
+              </button>
+            </>
+          )}
+          {page === "login" && (
+            <>
+              <span className="nav-link" onClick={() => onNav("landing")}>
+                ← HOME
+              </span>
+              <span className="nav-link" onClick={() => onNav("register")}>
+                REGISTER
+              </span>
+            </>
+          )}
+          {page === "register" && (
+            <>
+              <span className="nav-link" onClick={() => onNav("landing")}>
+                ← HOME
+              </span>
+              <span className="nav-link" onClick={() => onNav("login")}>
+                LOGIN
+              </span>
+            </>
+          )}
+          {page === "warroom" && (
+            <>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: "50%",
+                    background: t.accent,
+                    animation: "pulse-accent 2s ease infinite",
+                    display: "inline-block",
+                    boxShadow: `0 0 8px ${t.accent}`,
+                  }}
+                />
+                <span
+                  style={{ fontSize: 10, color: t.textDim, letterSpacing: 1 }}
+                >
+                  SYSTEM ONLINE
+                </span>
+              </div>
+              {user && (
+                <span style={{ fontSize: 11, color: t.textDim }}>{user}</span>
+              )}
+              <button
+                onClick={() => onNav("landing")}
+                style={{
+                  padding: "7px 16px",
+                  borderRadius: 6,
+                  fontFamily: "IBM Plex Mono",
+                  fontSize: 10,
+                  cursor: "none",
+                  letterSpacing: 1,
+                  background: t.accentBg,
+                  color: t.textDim,
+                  border: `1px solid ${t.accentBorder}`,
+                  transition: "all 0.2s",
+                }}
+              >
+                LOGOUT
+              </button>
+            </>
+          )}
+        </div>
+      </nav>
+    );
+  }
+
+  // Mobile nav + sidebar
+  return (
+    <>
+      {/* Mobile top bar */}
+      <nav
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 300,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 16px",
+          height: 56,
+          background: t.bgNav,
+          backdropFilter: "blur(24px) saturate(160%)",
+          WebkitBackdropFilter: "blur(24px) saturate(160%)",
+          borderBottom: `1px solid ${t.accentBorder}`,
+          boxShadow: `0 4px 24px rgba(0,0,0,0.5)`,
+          transition: "background 0.5s ease",
+        }}
+      >
+        {/* Logo */}
+        <div
+          style={{ display: "flex", alignItems: "center", gap: 10 }}
+          onClick={() => {
+            onNav("landing");
+            closeSidebar();
+          }}
+          data-hover
+        >
+          <div
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: 7,
+              background: t.logoGradient,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 900,
+              fontSize: 16,
+              color: t.logoColor,
+              boxShadow: `0 0 16px ${t.accentGlow}`,
+            }}
+          >
+            A
+          </div>
+          <span
+            style={{
+              fontFamily: "Syne, sans-serif",
+              fontWeight: 800,
+              fontSize: 15,
+              color: t.textBright,
+              letterSpacing: 2,
+              textShadow: `0 0 16px ${t.accentGlow}`,
+            }}
+          >
+            ALLYVEX
+          </span>
+        </div>
+
+        {/* Right side: theme toggle + hamburger */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <ThemeToggle onToggle={onToggleTheme} />
+          {/* Hamburger / close button */}
+          <button
+            onClick={() => setSidebarOpen((o) => !o)}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 8,
+              background: sidebarOpen ? t.accentBg2 : t.accentBg,
+              border: `1px solid ${sidebarOpen ? t.accentBorderStrong : t.accentBorder}`,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 5,
+              cursor: "pointer",
+              padding: 0,
+              transition: "all 0.25s",
+            }}
+            aria-label="Toggle menu"
+          >
+            <span
+              style={{
+                display: "block",
+                width: 18,
+                height: 1.5,
+                borderRadius: 2,
+                background: t.accent,
+                transform: sidebarOpen
+                  ? "translateY(6.5px) rotate(45deg)"
+                  : "none",
+                transition: "transform 0.25s ease",
+              }}
+            />
+            <span
+              style={{
+                display: "block",
+                width: 18,
+                height: 1.5,
+                borderRadius: 2,
+                background: t.accent,
+                opacity: sidebarOpen ? 0 : 1,
+                transition: "opacity 0.2s ease",
+              }}
+            />
+            <span
+              style={{
+                display: "block",
+                width: 18,
+                height: 1.5,
+                borderRadius: 2,
+                background: t.accent,
+                transform: sidebarOpen
+                  ? "translateY(-6.5px) rotate(-45deg)"
+                  : "none",
+                transition: "transform 0.25s ease",
+              }}
+            />
           </button>
-        </>
-      )}
-    </div>
-  </nav>
-);
+        </div>
+      </nav>
+
+      {/* Backdrop */}
+      <div
+        onClick={closeSidebar}
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 350,
+          background: "rgba(0,0,0,0.6)",
+          backdropFilter: "blur(4px)",
+          opacity: sidebarOpen ? 1 : 0,
+          pointerEvents: sidebarOpen ? "auto" : "none",
+          transition: "opacity 0.3s ease",
+        }}
+      />
+
+      {/* Sidebar drawer */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 400,
+          width: 280,
+          background: t.bgCard,
+          backdropFilter: "blur(32px) saturate(180%)",
+          WebkitBackdropFilter: "blur(32px) saturate(180%)",
+          borderLeft: `1px solid ${t.accentBorder2}`,
+          boxShadow: `-20px 0 60px rgba(0,0,0,0.6), inset 1px 0 0 ${t.accentBorder}`,
+          transform: sidebarOpen ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        {/* Sidebar header */}
+        <div
+          style={{
+            padding: "20px 24px 16px",
+            borderBottom: `1px solid ${t.accentBorder}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: `linear-gradient(180deg, ${t.accentBg} 0%, transparent 100%)`,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontFamily: "Syne, sans-serif",
+                fontWeight: 800,
+                fontSize: 13,
+                color: t.textHeading,
+                letterSpacing: 3,
+              }}
+            >
+              MENU
+            </div>
+            {page === "warroom" && user && (
+              <div
+                style={{
+                  fontSize: 10,
+                  color: t.textDim,
+                  marginTop: 3,
+                  letterSpacing: 1,
+                }}
+              >
+                {user}
+              </div>
+            )}
+          </div>
+          {page === "warroom" && (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <span
+                style={{
+                  width: 6,
+                  height: 6,
+                  borderRadius: "50%",
+                  background: t.accent,
+                  animation: "pulse-accent 2s ease infinite",
+                  display: "inline-block",
+                  boxShadow: `0 0 8px ${t.accent}`,
+                }}
+              />
+              <span style={{ fontSize: 9, color: t.textDim, letterSpacing: 1 }}>
+                ONLINE
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar nav items */}
+        <div style={{ flex: 1, overflowY: "auto", paddingTop: 8 }}>
+          {/* Accent top bar on sidebar */}
+          <div
+            style={{
+              height: 2,
+              background: `linear-gradient(90deg, ${t.accent}, ${t.secondary}, transparent)`,
+              marginBottom: 8,
+            }}
+          />
+
+          {page === "landing" && (
+            <>
+              {navItem("⊕  HOME", () => onNav("landing"))}
+              {navItem("◎  LOGIN", () => onNav("login"))}
+              {navItem("◆  REGISTER", () => onNav("register"))}
+            </>
+          )}
+
+          {page === "login" && (
+            <>
+              {navItem("← BACK TO HOME", () => onNav("landing"))}
+              {navItem("◆  REGISTER", () => onNav("register"))}
+            </>
+          )}
+
+          {page === "register" && (
+            <>
+              {navItem("← BACK TO HOME", () => onNav("landing"))}
+              {navItem("◎  LOGIN", () => onNav("login"))}
+            </>
+          )}
+
+          {page === "warroom" && (
+            <>
+              {navItem("◈  NEW ANALYSIS", () => {})}
+              {navItem("← LOGOUT", () => onNav("landing"))}
+            </>
+          )}
+
+          {/* GET ACCESS accent button */}
+          {page === "landing" &&
+            navItem("→ GET ACCESS", () => onNav("register"), true)}
+          {page === "warroom" &&
+            navItem("→ GO TO HOME", () => onNav("landing"), true)}
+        </div>
+
+        {/* Sidebar footer */}
+        <div
+          style={{
+            padding: "16px 24px",
+            borderTop: `1px solid ${t.accentBorder}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <span style={{ fontSize: 9, color: t.textDarkest, letterSpacing: 2 }}>
+            ALLYVEX v1.0
+          </span>
+          <span style={{ fontSize: 9, color: t.textFaint, letterSpacing: 1 }}>
+            {t.name === "gold" ? "◆ GOLD" : "◈ NEBULA"}
+          </span>
+        </div>
+      </div>
+    </>
+  );
+};
 
 // ══════════════════════════════════════════════════════
 // PAGE 1: LANDING
 // ══════════════════════════════════════════════════════
 const HeroVisual = ({ mouseX, mouseY }) => {
+  const t = useTheme();
   const rx = mouseY * 15,
     ry = mouseX * 15;
-  const colors = ["#f5c842", "#ff4d6d", "#e8a020", "#c9a227"];
+  const colors = [t.bull, t.bear, t.detective, t.orchestrator];
   const agentLabels = [
-    { label: "BULL", color: "#f5c842", offset: { x: -220, y: -80 } },
-    { label: "BEAR", color: "#ff4d6d", offset: { x: 220, y: 60 } },
-    { label: "DETECTIVE", color: "#e8a020", offset: { x: -180, y: 100 } },
-    { label: "ORCHESTRATOR", color: "#c9a227", offset: { x: 160, y: -110 } },
+    { label: "BULL", color: t.bull, offset: { x: -220, y: -80 } },
+    { label: "BEAR", color: t.bear, offset: { x: 220, y: 60 } },
+    { label: "DETECTIVE", color: t.detective, offset: { x: -180, y: 100 } },
+    {
+      label: "ORCHESTRATOR",
+      color: t.orchestrator,
+      offset: { x: 160, y: -110 },
+    },
   ];
-  const toRgb = {
-    "#f5c842": "245,200,66",
-    "#ff4d6d": "255,77,109",
-    "#e8a020": "232,160,32",
-    "#c9a227": "201,162,39",
+
+  const hexToRgb = (hex) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `${r},${g},${b}`;
   };
+
   return (
     <div
       style={{
@@ -658,13 +1258,12 @@ const HeroVisual = ({ mouseX, mouseY }) => {
         zIndex: 0,
       }}
     >
-      {/* Outer rings */}
       <div
         style={{
           position: "absolute",
           width: 540,
           height: 540,
-          border: "1px solid rgba(245,200,66,0.05)",
+          border: `1px solid ${t.accentBg}`,
           borderRadius: "50%",
           transform: `rotateX(${rx}deg) rotateY(${ry}deg)`,
           transition: "transform 0.1s ease-out",
@@ -675,20 +1274,19 @@ const HeroVisual = ({ mouseX, mouseY }) => {
           position: "absolute",
           width: 430,
           height: 430,
-          border: "1px solid rgba(245,200,66,0.08)",
+          border: `1px solid ${t.accentBorder}`,
           borderRadius: "50%",
           transform: `rotateX(${rx * 1.2}deg) rotateY(${ry * 1.2}deg)`,
           transition: "transform 0.1s ease-out",
         }}
       />
-      {/* Spinning rings */}
       <div
         style={{
           position: "absolute",
           width: 360,
           height: 360,
           borderRadius: "50%",
-          border: "1px dashed rgba(245,200,66,0.18)",
+          border: `1px dashed ${t.accentBorder2}`,
           animation: "spin-ring 22s linear infinite",
         }}
       />
@@ -698,11 +1296,10 @@ const HeroVisual = ({ mouseX, mouseY }) => {
           width: 280,
           height: 280,
           borderRadius: "50%",
-          border: "1px dashed rgba(232,160,32,0.12)",
+          border: `1px dashed ${t.secondaryBorder}`,
           animation: "counter-ring 16s linear infinite",
         }}
       />
-      {/* Center orb */}
       <div
         style={{
           position: "relative",
@@ -716,8 +1313,7 @@ const HeroVisual = ({ mouseX, mouseY }) => {
           style={{
             position: "absolute",
             inset: -70,
-            background:
-              "radial-gradient(ellipse, rgba(245,200,66,0.14) 0%, transparent 60%)",
+            background: `radial-gradient(ellipse, ${t.accentBg2} 0%, transparent 60%)`,
             borderRadius: "50%",
           }}
         />
@@ -726,11 +1322,13 @@ const HeroVisual = ({ mouseX, mouseY }) => {
             position: "absolute",
             inset: 0,
             background:
-              "radial-gradient(ellipse at 35% 35%, rgba(245,200,66,0.28) 0%, rgba(140,100,10,0.45) 50%, rgba(10,7,0,0.95) 100%)",
+              t.name === "gold"
+                ? "radial-gradient(ellipse at 35% 35%, rgba(245,200,66,0.28) 0%, rgba(140,100,10,0.45) 50%, rgba(10,7,0,0.95) 100%)"
+                : "radial-gradient(ellipse at 35% 35%, rgba(167,139,250,0.28) 0%, rgba(60,30,120,0.45) 50%, rgba(4,2,14,0.95) 100%)",
             borderRadius: "50%",
-            border: "1px solid rgba(245,200,66,0.3)",
-            boxShadow:
-              "0 0 70px rgba(245,200,66,0.18), inset 0 0 50px rgba(245,200,66,0.08)",
+            border: `1px solid ${t.accentBorder2}`,
+            boxShadow: `0 0 70px ${t.accentBg2}, inset 0 0 50px ${t.accentBg}`,
+            transition: "background 0.6s ease, box-shadow 0.6s ease",
           }}
         />
         <div
@@ -755,15 +1353,14 @@ const HeroVisual = ({ mouseX, mouseY }) => {
             fontFamily: "Syne, sans-serif",
             fontWeight: 900,
             fontSize: 64,
-            color: "rgba(245,200,66,0.92)",
-            textShadow:
-              "0 0 30px rgba(245,200,66,0.7), 0 0 60px rgba(245,200,66,0.3)",
+            color: t.accent,
+            textShadow: `0 0 30px ${t.accent}, 0 0 60px ${t.accentGlow}`,
+            transition: "color 0.5s, text-shadow 0.5s",
           }}
         >
           A
         </div>
       </div>
-      {/* Orbiting dots */}
       {[0, 90, 180, 270].map((deg, i) => {
         const r = 180,
           angle = ((deg + mouseX * 10) * Math.PI) / 180;
@@ -780,12 +1377,11 @@ const HeroVisual = ({ mouseX, mouseY }) => {
               top: "50%",
               transform: `translate(calc(-50% + ${Math.cos(angle) * r}px), calc(-50% + ${Math.sin(angle) * r * 0.4}px))`,
               boxShadow: `0 0 16px ${colors[i]}, 0 0 4px ${colors[i]}`,
-              transition: "transform 0.1s ease-out",
+              transition: "transform 0.1s ease-out, background 0.5s",
             }}
           />
         );
       })}
-      {/* Agent labels */}
       {agentLabels.map(({ label, color, offset }, i) => (
         <div
           key={i}
@@ -800,19 +1396,19 @@ const HeroVisual = ({ mouseX, mouseY }) => {
             fontFamily: "IBM Plex Mono, monospace",
             fontWeight: 600,
             padding: "5px 10px",
-            background: `rgba(${toRgb[color]},0.08)`,
-            border: `1px solid rgba(${toRgb[color]},0.28)`,
+            background: `rgba(${hexToRgb(color)},0.08)`,
+            border: `1px solid rgba(${hexToRgb(color)},0.28)`,
             borderRadius: 5,
             whiteSpace: "nowrap",
             animation: `float-glyph ${6 + i}s ease-in-out infinite`,
             animationDelay: `${i * 1.5}s`,
             backdropFilter: "blur(8px)",
+            transition: "color 0.5s, border-color 0.5s",
           }}
         >
           {label}
         </div>
       ))}
-      {/* Scan */}
       <div
         style={{
           position: "absolute",
@@ -830,8 +1426,7 @@ const HeroVisual = ({ mouseX, mouseY }) => {
             left: 0,
             right: 0,
             height: "2px",
-            background:
-              "linear-gradient(90deg, transparent, rgba(245,200,66,0.7), transparent)",
+            background: `linear-gradient(90deg, transparent, ${t.scanColor}, transparent)`,
             animation: "scan 3.5s linear infinite",
           }}
         />
@@ -841,12 +1436,14 @@ const HeroVisual = ({ mouseX, mouseY }) => {
 };
 
 const LandingPage = ({ onNav }) => {
+  const t = useTheme();
+  const isMobile = useIsMobile();
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     setVisible(true);
     let handler;
-    const t = setTimeout(() => {
+    const timeout = setTimeout(() => {
       handler = (e) =>
         setMousePos({
           x: (e.clientX / window.innerWidth) * 2 - 1,
@@ -855,7 +1452,7 @@ const LandingPage = ({ onNav }) => {
       window.addEventListener("mousemove", handler);
     }, 600);
     return () => {
-      clearTimeout(t);
+      clearTimeout(timeout);
       if (handler) window.removeEventListener("mousemove", handler);
     };
   }, []);
@@ -863,19 +1460,19 @@ const LandingPage = ({ onNav }) => {
   const features = [
     {
       icon: "◎",
-      color: "#e8a020",
+      color: t.detective,
       title: "Autonomous Research",
       desc: "AI agents crawl the web to build a comprehensive dossier on any target company in seconds.",
     },
     {
       icon: "◈",
-      color: "#f5c842",
+      color: t.bull,
       title: "Dual-Track Verdicts",
       desc: "Get a definitive PURSUE / HOLD / AVOID verdict on both Customer and Partner tracks with confidence scores.",
     },
     {
       icon: "⊕",
-      color: "#c9a227",
+      color: t.orchestrator,
       title: "Instant Outreach",
       desc: "Generates hyper-personalized draft emails targeted exactly at the right decision-maker.",
     },
@@ -884,25 +1481,20 @@ const LandingPage = ({ onNav }) => {
     {
       icon: "◆",
       name: "Bull Agent",
-      color: "#f5c842",
+      color: t.bull,
       desc: "Building the case FOR",
     },
-    {
-      icon: "◈",
-      name: "Bear Agent",
-      color: "#ff4d6d",
-      desc: "Hunting red flags",
-    },
+    { icon: "◈", name: "Bear Agent", color: t.bear, desc: "Hunting red flags" },
     {
       icon: "◎",
       name: "Detective Agent",
-      color: "#e8a020",
+      color: t.detective,
       desc: "Auditing all evidence",
     },
     {
       icon: "⊕",
       name: "Orchestrator",
-      color: "#c9a227",
+      color: t.orchestrator,
       desc: "Final verdict engine",
     },
   ];
@@ -912,22 +1504,9 @@ const LandingPage = ({ onNav }) => {
     { val: "<60s", label: "Full Intel" },
     { val: "∞", label: "Targets" },
   ];
-  const toRgb = {
-    "#e8a020": "232,160,32",
-    "#f5c842": "245,200,66",
-    "#c9a227": "201,162,39",
-  };
-  const vColors = ["#f5c842", "#e8a020", "#ff4d6d"];
-  const vBgs = [
-    "rgba(245,200,66,0.1)",
-    "rgba(232,160,32,0.1)",
-    "rgba(255,77,109,0.1)",
-  ];
-  const vBorders = [
-    "rgba(245,200,66,0.35)",
-    "rgba(232,160,32,0.35)",
-    "rgba(255,77,109,0.35)",
-  ];
+  const vColors = [t.PURSUE.color, t.HOLD.color, t.AVOID.color];
+  const vBgs = [t.PURSUE.bg, t.HOLD.bg, t.AVOID.bg];
+  const vBorders = [t.PURSUE.border, t.HOLD.border, t.AVOID.border];
 
   const anim = (delay = 0) => ({
     opacity: visible ? 1 : 0,
@@ -935,8 +1514,25 @@ const LandingPage = ({ onNav }) => {
     transition: `all 0.7s ${delay}s ease`,
   });
 
+  const hexToRgb = (hex) => {
+    try {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `${r},${g},${b}`;
+    } catch {
+      return "245,200,66";
+    }
+  };
+
   return (
-    <div style={{ minHeight: "100vh", background: "#080600" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: t.bg,
+        transition: "background 0.5s",
+      }}
+    >
       <BgLayer mousePos={mousePos} />
       <div style={{ position: "relative", zIndex: 1 }}>
         {/* HERO */}
@@ -952,8 +1548,14 @@ const LandingPage = ({ onNav }) => {
             overflow: "hidden",
           }}
         >
-          <div style={{ maxWidth: 600, position: "relative", zIndex: 2 }}>
-            {/* Live badge */}
+          <div
+            style={{
+              maxWidth: isMobile ? "100%" : 600,
+              position: "relative",
+              zIndex: 2,
+              width: "100%",
+            }}
+          >
             <div
               style={{
                 display: "inline-flex",
@@ -961,8 +1563,8 @@ const LandingPage = ({ onNav }) => {
                 gap: 8,
                 padding: "7px 18px",
                 borderRadius: 6,
-                background: "rgba(245,200,66,0.06)",
-                border: "1px solid rgba(245,200,66,0.2)",
+                background: t.accentBg,
+                border: `1px solid ${t.accentBorder}`,
                 marginBottom: 40,
                 backdropFilter: "blur(12px)",
                 ...anim(0),
@@ -973,16 +1575,16 @@ const LandingPage = ({ onNav }) => {
                   width: 6,
                   height: 6,
                   borderRadius: "50%",
-                  background: "#f5c842",
-                  animation: "pulse-gold 1.5s ease infinite",
+                  background: t.accent,
+                  animation: "pulse-accent 1.5s ease infinite",
                   display: "inline-block",
-                  boxShadow: "0 0 8px rgba(245,200,66,0.7)",
+                  boxShadow: `0 0 8px ${t.accent}`,
                 }}
               />
               <span
                 style={{
                   fontSize: 10,
-                  color: "#f5c842",
+                  color: t.accent,
                   letterSpacing: 3,
                   fontWeight: 500,
                 }}
@@ -990,43 +1592,45 @@ const LandingPage = ({ onNav }) => {
                 ALLYVEX INTELLIGENCE IS LIVE
               </span>
             </div>
-            <h1
-              style={{
-                fontFamily: "Syne, sans-serif",
-                fontWeight: 900,
-                fontSize: "clamp(44px,6vw,84px)",
-                lineHeight: 1.04,
-                letterSpacing: -2,
-                color: "#f0e8d0",
-                marginBottom: 12,
-                ...anim(0.1),
-              }}
-            >
-              Beyond the
-            </h1>
-            <h1
-              style={{
-                fontFamily: "Syne, sans-serif",
-                fontWeight: 900,
-                fontSize: "clamp(44px,6vw,84px)",
-                lineHeight: 1.04,
-                letterSpacing: -2,
-                marginBottom: 32,
-                background:
-                  "linear-gradient(135deg, #c9a227 0%, #f5c842 45%, #e8c040 70%, #b8860b 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-                filter: "drop-shadow(0 0 20px rgba(245,200,66,0.3))",
-                ...anim(0.2),
-              }}
-            >
-              Search Bar.
-            </h1>
+            <div style={{ marginBottom: 32, ...anim(0.1) }}>
+              <div
+                style={{
+                  fontFamily: "Syne, sans-serif",
+                  fontWeight: 900,
+                  fontSize: "clamp(44px,6vw,84px)",
+                  lineHeight: 1.04,
+                  letterSpacing: -2,
+                  color: t.textHeading,
+                }}
+              >
+                Beyond the
+              </div>
+              <div
+                style={{
+                  fontFamily: "Syne, sans-serif",
+                  fontWeight: 900,
+                  fontSize: "clamp(44px,6vw,84px)",
+                  lineHeight: 1.04,
+                  letterSpacing: -2,
+                }}
+              >
+                <span
+                  style={{
+                    color: t.name === "purple" ? "#f0ecff" : "#f5c842",
+                    textShadow:
+                      t.name === "purple"
+                        ? "0 0 30px rgba(167,139,250,0.8), 0 0 60px rgba(167,139,250,0.4), 0 0 100px rgba(167,139,250,0.2)"
+                        : "0 0 30px rgba(245,200,66,0.7), 0 0 60px rgba(245,200,66,0.3)",
+                  }}
+                >
+                  Search Bar.
+                </span>
+              </div>
+            </div>
             <p
               style={{
                 fontSize: "clamp(14px,1.4vw,18px)",
-                color: "#7a6840",
+                color: t.textDim,
                 lineHeight: 1.8,
                 maxWidth: 500,
                 marginBottom: 48,
@@ -1059,43 +1663,49 @@ const LandingPage = ({ onNav }) => {
                 LOGIN
               </button>
             </div>
-            {/* Stats */}
             <div
               style={{
                 display: "flex",
                 marginTop: 72,
-                border: "1px solid rgba(245,200,66,0.1)",
+                border: `1px solid ${t.accentBorder}`,
                 borderRadius: 10,
                 overflow: "hidden",
                 backdropFilter: "blur(16px)",
                 ...anim(0.6),
               }}
             >
-              {stats.map((s, i) => (
+              {/* {stats.map((s, i) => (
                 <div key={i} className="stat-card">
                   <div
                     style={{
                       fontFamily: "Syne, sans-serif",
                       fontWeight: 800,
                       fontSize: 30,
-                      color: "#f5c842",
+                      color: t.accent,
                       letterSpacing: 1,
                       marginBottom: 4,
-                      textShadow: "0 0 24px rgba(245,200,66,0.4)",
+                      textShadow: `0 0 24px ${t.accentGlow}`,
+                      transition: "color 0.5s, text-shadow 0.5s",
                     }}
                   >
                     {s.val}
                   </div>
                   <div
-                    style={{ fontSize: 9, color: "#4a3c1a", letterSpacing: 2 }}
+                    style={{
+                      fontSize: 9,
+                      color: t.textDarkest,
+                      letterSpacing: 2,
+                    }}
                   >
                     {s.label}
                   </div>
                 </div>
-              ))}
+              ))} */}
             </div>
           </div>
-          <HeroVisual mouseX={mousePos.x} mouseY={mousePos.y} />
+          <div style={{ display: "contents" }} className="hero-visual-wrapper">
+            <HeroVisual mouseX={mousePos.x} mouseY={mousePos.y} />
+          </div>
         </section>
 
         <div className="section-divider" />
@@ -1108,7 +1718,7 @@ const LandingPage = ({ onNav }) => {
             <div
               style={{
                 fontSize: 10,
-                color: "#5a4820",
+                color: t.textFaint,
                 letterSpacing: 4,
                 marginBottom: 14,
               }}
@@ -1120,7 +1730,7 @@ const LandingPage = ({ onNav }) => {
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 800,
                 fontSize: "clamp(28px,4vw,52px)",
-                color: "#f0e8d0",
+                color: t.textHeading,
                 letterSpacing: -1,
                 marginBottom: 16,
               }}
@@ -1130,7 +1740,7 @@ const LandingPage = ({ onNav }) => {
             <p
               style={{
                 fontSize: 13,
-                color: "#5a4820",
+                color: t.textFaint,
                 maxWidth: 480,
                 margin: "0 auto",
               }}
@@ -1165,14 +1775,15 @@ const LandingPage = ({ onNav }) => {
                     height: 52,
                     borderRadius: 10,
                     marginBottom: 24,
-                    background: `rgba(${toRgb[f.color]},0.08)`,
-                    border: `1px solid rgba(${toRgb[f.color]},0.22)`,
+                    background: `rgba(${hexToRgb(f.color)},0.08)`,
+                    border: `1px solid rgba(${hexToRgb(f.color)},0.22)`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontSize: 22,
                     color: f.color,
                     backdropFilter: "blur(8px)",
+                    transition: "color 0.5s",
                   }}
                 >
                   {f.icon}
@@ -1182,13 +1793,15 @@ const LandingPage = ({ onNav }) => {
                     fontFamily: "Syne, sans-serif",
                     fontWeight: 700,
                     fontSize: 20,
-                    color: "#f0e8d0",
+                    color: t.textHeading,
                     marginBottom: 12,
                   }}
                 >
                   {f.title}
                 </h3>
-                <p style={{ fontSize: 12, color: "#6a5830", lineHeight: 1.8 }}>
+                <p
+                  style={{ fontSize: 12, color: t.textFaint, lineHeight: 1.8 }}
+                >
                   {f.desc}
                 </p>
               </div>
@@ -1203,15 +1816,15 @@ const LandingPage = ({ onNav }) => {
           style={{
             padding: "120px 48px",
             background: "rgba(0,0,0,0.3)",
-            borderTop: "1px solid rgba(245,200,66,0.06)",
-            borderBottom: "1px solid rgba(245,200,66,0.06)",
+            borderTop: `1px solid ${t.accentBg}`,
+            borderBottom: `1px solid ${t.accentBg}`,
           }}
         >
           <div style={{ maxWidth: 900, margin: "0 auto", textAlign: "center" }}>
             <div
               style={{
                 fontSize: 10,
-                color: "#5a4820",
+                color: t.textFaint,
                 letterSpacing: 4,
                 marginBottom: 14,
               }}
@@ -1223,7 +1836,7 @@ const LandingPage = ({ onNav }) => {
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 800,
                 fontSize: "clamp(24px,3.5vw,48px)",
-                color: "#f0e8d0",
+                color: t.textHeading,
                 letterSpacing: -1,
                 marginBottom: 16,
               }}
@@ -1233,7 +1846,7 @@ const LandingPage = ({ onNav }) => {
             <p
               style={{
                 fontSize: 13,
-                color: "#5a4820",
+                color: t.textFaint,
                 maxWidth: 460,
                 margin: "0 auto 60px",
               }}
@@ -1261,6 +1874,7 @@ const LandingPage = ({ onNav }) => {
                         fontSize: 16,
                         color: a.color,
                         textShadow: `0 0 10px ${a.color}`,
+                        transition: "color 0.5s, text-shadow 0.5s",
                       }}
                     >
                       {a.icon}
@@ -1270,7 +1884,7 @@ const LandingPage = ({ onNav }) => {
                         style={{
                           fontSize: 11,
                           fontWeight: 600,
-                          color: "#e8d9b0",
+                          color: t.textPrimary,
                           letterSpacing: 1,
                         }}
                       >
@@ -1279,7 +1893,7 @@ const LandingPage = ({ onNav }) => {
                       <div
                         style={{
                           fontSize: 9,
-                          color: "#5a4820",
+                          color: t.textFaint,
                           letterSpacing: 1,
                           marginTop: 2,
                         }}
@@ -1293,11 +1907,12 @@ const LandingPage = ({ onNav }) => {
                         height: 6,
                         borderRadius: "50%",
                         background: a.color,
-                        animation: "pulse-gold 2s ease infinite",
+                        animation: "pulse-accent 2s ease infinite",
                         animationDelay: `${i * 0.4}s`,
                         display: "inline-block",
                         marginLeft: 4,
                         boxShadow: `0 0 8px ${a.color}`,
+                        transition: "background 0.5s",
                       }}
                     />
                   </div>
@@ -1305,7 +1920,7 @@ const LandingPage = ({ onNav }) => {
                     <div
                       style={{
                         fontSize: 14,
-                        color: "#2a2010",
+                        color: t.textDarkest,
                         margin: "0 4px",
                       }}
                     >
@@ -1315,21 +1930,20 @@ const LandingPage = ({ onNav }) => {
                 </div>
               ))}
             </div>
-            {/* Verdict output */}
             <div
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 16,
                 padding: "16px 28px",
-                background: "rgba(18,13,4,0.8)",
-                border: "1px solid rgba(245,200,66,0.15)",
+                background: t.bgCard,
+                border: `1px solid ${t.accentBorder}`,
                 borderRadius: 10,
                 backdropFilter: "blur(16px)",
               }}
             >
               <span
-                style={{ fontSize: 10, color: "#5a4820", letterSpacing: 2 }}
+                style={{ fontSize: 10, color: t.textFaint, letterSpacing: 2 }}
               >
                 VERDICT OUTPUT →
               </span>
@@ -1362,7 +1976,7 @@ const LandingPage = ({ onNav }) => {
                 width: 64,
                 height: 64,
                 margin: "0 auto 32px",
-                background: "linear-gradient(135deg,#b8860b,#f5c842,#c9a227)",
+                background: t.logoGradient,
                 borderRadius: 14,
                 display: "flex",
                 alignItems: "center",
@@ -1370,9 +1984,9 @@ const LandingPage = ({ onNav }) => {
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 900,
                 fontSize: 32,
-                color: "#0d0900",
-                boxShadow:
-                  "0 0 50px rgba(245,200,66,0.25), 0 0 100px rgba(245,200,66,0.08)",
+                color: t.logoColor,
+                boxShadow: `0 0 50px ${t.accentGlow}, 0 0 100px ${t.accentBg}`,
+                transition: "all 0.5s",
               }}
             >
               A
@@ -1382,7 +1996,7 @@ const LandingPage = ({ onNav }) => {
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 900,
                 fontSize: "clamp(30px,4.5vw,58px)",
-                color: "#f0e8d0",
+                color: t.textHeading,
                 letterSpacing: -1,
                 marginBottom: 24,
                 lineHeight: 1.1,
@@ -1395,7 +2009,7 @@ const LandingPage = ({ onNav }) => {
             <p
               style={{
                 fontSize: 14,
-                color: "#6a5830",
+                color: t.textDim,
                 lineHeight: 1.8,
                 maxWidth: 520,
                 margin: "0 auto 48px",
@@ -1429,14 +2043,14 @@ const LandingPage = ({ onNav }) => {
         {/* Footer */}
         <footer
           style={{
-            borderTop: "1px solid rgba(245,200,66,0.08)",
+            borderTop: `1px solid ${t.accentBg}`,
             padding: "32px 48px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             flexWrap: "wrap",
             gap: 16,
-            background: "rgba(6,4,0,0.6)",
+            background: t.bgOverlay,
             backdropFilter: "blur(16px)",
           }}
         >
@@ -1446,14 +2060,15 @@ const LandingPage = ({ onNav }) => {
                 width: 28,
                 height: 28,
                 borderRadius: 5,
-                background: "linear-gradient(135deg,#b8860b,#f5c842)",
+                background: t.logoGradient,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 900,
                 fontSize: 14,
-                color: "#0d0900",
+                color: t.logoColor,
+                transition: "all 0.5s",
               }}
             >
               A
@@ -1463,14 +2078,14 @@ const LandingPage = ({ onNav }) => {
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 700,
                 fontSize: 14,
-                color: "#3a2e18",
+                color: t.textDarkest,
                 letterSpacing: 2,
               }}
             >
               ALLYVEX
             </span>
           </div>
-          <div style={{ fontSize: 10, color: "#2a2010", letterSpacing: 2 }}>
+          <div style={{ fontSize: 10, color: t.textDarkest, letterSpacing: 2 }}>
             INTELLIGENCE PIPELINE v1.0 — ALL RIGHTS RESERVED
           </div>
           <div style={{ display: "flex", gap: 20 }}>
@@ -1490,6 +2105,8 @@ const LandingPage = ({ onNav }) => {
 // PAGE 2: LOGIN
 // ══════════════════════════════════════════════════════
 const LoginPage = ({ onNav, onSuccess }) => {
+  const t = useTheme();
+  const isMobile = useIsMobile();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -1521,12 +2138,13 @@ const LoginPage = ({ onNav, onSuccess }) => {
     <div
       style={{
         minHeight: "100vh",
-        background: "#080600",
+        background: t.bg,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 24,
         position: "relative",
+        transition: "background 0.5s",
       }}
     >
       <BgLayer />
@@ -1539,7 +2157,6 @@ const LoginPage = ({ onNav, onSuccess }) => {
         }}
         className="page-in"
       >
-        {/* Logo */}
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <div
             style={{
@@ -1548,15 +2165,15 @@ const LoginPage = ({ onNav, onSuccess }) => {
               justifyContent: "center",
               width: 60,
               height: 60,
-              background: "linear-gradient(135deg,#b8860b,#f5c842,#c9a227)",
+              background: t.logoGradient,
               borderRadius: 12,
               fontSize: 28,
               fontWeight: 800,
-              color: "#0d0900",
+              color: t.logoColor,
               fontFamily: "Syne, sans-serif",
               marginBottom: 16,
-              boxShadow:
-                "0 0 40px rgba(245,200,66,0.25), 0 0 80px rgba(245,200,66,0.08)",
+              boxShadow: `0 0 40px ${t.accentGlow}, 0 0 80px ${t.accentBg}`,
+              transition: "all 0.5s",
             }}
           >
             A
@@ -1566,9 +2183,10 @@ const LoginPage = ({ onNav, onSuccess }) => {
               fontFamily: "Syne, sans-serif",
               fontWeight: 800,
               fontSize: 22,
-              color: "#f0d878",
+              color: t.textBright,
               letterSpacing: 3,
-              textShadow: "0 0 20px rgba(245,200,66,0.2)",
+              textShadow: `0 0 20px ${t.accentBg2}`,
+              transition: "color 0.5s",
             }}
           >
             ALLYVEX
@@ -1576,7 +2194,7 @@ const LoginPage = ({ onNav, onSuccess }) => {
           <div
             style={{
               fontSize: 10,
-              color: "#5a4820",
+              color: t.textFaint,
               letterSpacing: 3,
               marginTop: 6,
             }}
@@ -1584,9 +2202,7 @@ const LoginPage = ({ onNav, onSuccess }) => {
             SECURE ACCESS
           </div>
         </div>
-
-        <div className="glass-gold" style={{ padding: 36 }}>
-          {/* Gold top line */}
+        <div className="glass-gold" style={{ padding: isMobile ? 20 : 32 }}>
           <div
             style={{
               position: "absolute",
@@ -1594,15 +2210,14 @@ const LoginPage = ({ onNav, onSuccess }) => {
               left: 32,
               right: 32,
               height: 1,
-              background:
-                "linear-gradient(90deg,transparent,rgba(245,200,66,0.4),transparent)",
+              background: `linear-gradient(90deg,transparent,${t.accentBorder2},transparent)`,
               borderRadius: 1,
             }}
           />
           <div
             style={{
               fontSize: 10,
-              color: "#5a4820",
+              color: t.textFaint,
               letterSpacing: 3,
               marginBottom: 20,
             }}
@@ -1621,7 +2236,7 @@ const LoginPage = ({ onNav, onSuccess }) => {
               <div
                 style={{
                   fontSize: 10,
-                  color: "#5a4820",
+                  color: t.textFaint,
                   letterSpacing: 3,
                   marginBottom: 8,
                 }}
@@ -1641,7 +2256,7 @@ const LoginPage = ({ onNav, onSuccess }) => {
               <div
                 style={{
                   fontSize: 10,
-                  color: "#5a4820",
+                  color: t.textFaint,
                   letterSpacing: 3,
                   marginBottom: 8,
                 }}
@@ -1663,13 +2278,13 @@ const LoginPage = ({ onNav, onSuccess }) => {
             <span
               style={{
                 fontSize: 10,
-                color: "#3a2e18",
+                color: t.textVeryFaint,
                 cursor: "none",
                 letterSpacing: 1,
                 transition: "color 0.2s",
               }}
-              onMouseEnter={(e) => (e.target.style.color = "#f5c842")}
-              onMouseLeave={(e) => (e.target.style.color = "#3a2e18")}
+              onMouseEnter={(e) => (e.target.style.color = t.accent)}
+              onMouseLeave={(e) => (e.target.style.color = t.textVeryFaint)}
               data-hover
             >
               FORGOT PASSWORD?
@@ -1679,11 +2294,11 @@ const LoginPage = ({ onNav, onSuccess }) => {
             <div
               style={{
                 padding: "10px 14px",
-                background: "rgba(255,77,109,0.07)",
-                border: "1px solid rgba(255,77,109,0.25)",
+                background: t.dangerBg,
+                border: `1px solid ${t.dangerBorder}`,
                 borderRadius: 7,
                 fontSize: 11,
-                color: "#ff4d6d",
+                color: t.danger,
                 marginBottom: 16,
               }}
             >
@@ -1693,7 +2308,6 @@ const LoginPage = ({ onNav, onSuccess }) => {
           <button
             onClick={handle}
             disabled={loading}
-            className={loading ? "" : "btn-primary"}
             style={{
               width: "100%",
               padding: 14,
@@ -1702,10 +2316,8 @@ const LoginPage = ({ onNav, onSuccess }) => {
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: 2,
-              background: loading
-                ? "rgba(245,200,66,0.12)"
-                : "linear-gradient(135deg,#b8860b,#f5c842,#c9a227)",
-              color: loading ? "#5a4820" : "#0d0900",
+              background: loading ? t.accentBg2 : t.logoGradientBtn,
+              color: loading ? t.textFaint : t.logoColor,
               border: "none",
               cursor: loading ? "not-allowed" : "none",
               opacity: loading ? 0.7 : 1,
@@ -1734,13 +2346,13 @@ const LoginPage = ({ onNav, onSuccess }) => {
               marginTop: 20,
               textAlign: "center",
               fontSize: 11,
-              color: "#3a2e18",
+              color: t.textVeryFaint,
             }}
           >
             No account?{" "}
             <span
               onClick={() => onNav("register")}
-              style={{ color: "#f5c842", cursor: "none" }}
+              style={{ color: t.accent, cursor: "none" }}
               data-hover
             >
               Register your company
@@ -1765,6 +2377,8 @@ const LoginPage = ({ onNav, onSuccess }) => {
 // PAGE 3: REGISTER
 // ══════════════════════════════════════════════════════
 const RegisterPage = ({ onNav, onSuccess }) => {
+  const t = useTheme();
+  const isMobile = useIsMobile();
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -1802,12 +2416,13 @@ const RegisterPage = ({ onNav, onSuccess }) => {
     <div
       style={{
         minHeight: "100vh",
-        background: "#080600",
+        background: t.bg,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         padding: 24,
         position: "relative",
+        transition: "background 0.5s",
       }}
     >
       <BgLayer />
@@ -1828,14 +2443,15 @@ const RegisterPage = ({ onNav, onSuccess }) => {
               justifyContent: "center",
               width: 60,
               height: 60,
-              background: "linear-gradient(135deg,#b8860b,#f5c842,#c9a227)",
+              background: t.logoGradient,
               borderRadius: 12,
               fontSize: 28,
               fontWeight: 800,
-              color: "#0d0900",
+              color: t.logoColor,
               fontFamily: "Syne, sans-serif",
               marginBottom: 16,
-              boxShadow: "0 0 40px rgba(245,200,66,0.25)",
+              boxShadow: `0 0 40px ${t.accentGlow}`,
+              transition: "all 0.5s",
             }}
           >
             A
@@ -1845,8 +2461,9 @@ const RegisterPage = ({ onNav, onSuccess }) => {
               fontFamily: "Syne, sans-serif",
               fontWeight: 800,
               fontSize: 22,
-              color: "#f0d878",
+              color: t.textBright,
               letterSpacing: 3,
+              transition: "color 0.5s",
             }}
           >
             ALLYVEX
@@ -1854,7 +2471,7 @@ const RegisterPage = ({ onNav, onSuccess }) => {
           <div
             style={{
               fontSize: 10,
-              color: "#5a4820",
+              color: t.textFaint,
               letterSpacing: 3,
               marginTop: 6,
             }}
@@ -1873,14 +2490,13 @@ const RegisterPage = ({ onNav, onSuccess }) => {
               left: 32,
               right: 32,
               height: 1,
-              background:
-                "linear-gradient(90deg,transparent,rgba(245,200,66,0.4),transparent)",
+              background: `linear-gradient(90deg,transparent,${t.accentBorder2},transparent)`,
             }}
           />
           <div
             style={{
               fontSize: 10,
-              color: "#5a4820",
+              color: t.textFaint,
               letterSpacing: 3,
               marginBottom: 20,
             }}
@@ -1929,7 +2545,7 @@ const RegisterPage = ({ onNav, onSuccess }) => {
                 <div
                   style={{
                     fontSize: 10,
-                    color: "#5a4820",
+                    color: t.textFaint,
                     letterSpacing: 3,
                     marginBottom: 8,
                   }}
@@ -1951,11 +2567,11 @@ const RegisterPage = ({ onNav, onSuccess }) => {
             <div
               style={{
                 padding: "10px 14px",
-                background: "rgba(255,77,109,0.07)",
-                border: "1px solid rgba(255,77,109,0.25)",
+                background: t.dangerBg,
+                border: `1px solid ${t.dangerBorder}`,
                 borderRadius: 7,
                 fontSize: 11,
-                color: "#ff4d6d",
+                color: t.danger,
                 marginBottom: 16,
               }}
             >
@@ -1973,10 +2589,8 @@ const RegisterPage = ({ onNav, onSuccess }) => {
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: 2,
-              background: loading
-                ? "rgba(245,200,66,0.1)"
-                : "linear-gradient(135deg,#b8860b,#f5c842,#c9a227)",
-              color: loading ? "#5a4820" : "#0d0900",
+              background: loading ? t.accentBg2 : t.logoGradientBtn,
+              color: loading ? t.textFaint : t.logoColor,
               border: "none",
               cursor: loading ? "not-allowed" : "none",
               opacity: loading ? 0.7 : 1,
@@ -2005,13 +2619,13 @@ const RegisterPage = ({ onNav, onSuccess }) => {
               marginTop: 20,
               textAlign: "center",
               fontSize: 11,
-              color: "#3a2e18",
+              color: t.textVeryFaint,
             }}
           >
             Already have access?{" "}
             <span
               onClick={() => onNav("login")}
-              style={{ color: "#f5c842", cursor: "none" }}
+              style={{ color: t.accent, cursor: "none" }}
               data-hover
             >
               Login
@@ -2035,22 +2649,26 @@ const RegisterPage = ({ onNav, onSuccess }) => {
 // ══════════════════════════════════════════════════════
 // PAGE 4: WAR ROOM
 // ══════════════════════════════════════════════════════
-const SectionLabel = ({ children }) => (
-  <div
-    style={{
-      fontSize: 10,
-      color: "#5a4820",
-      letterSpacing: 3,
-      marginBottom: 12,
-      textTransform: "uppercase",
-    }}
-  >
-    {children}
-  </div>
-);
+const SectionLabel = ({ children }) => {
+  const t = useTheme();
+  return (
+    <div
+      style={{
+        fontSize: 10,
+        color: t.textFaint,
+        letterSpacing: 3,
+        marginBottom: 12,
+        textTransform: "uppercase",
+      }}
+    >
+      {children}
+    </div>
+  );
+};
 
 const VerdictBadge = ({ verdict, size = "sm" }) => {
-  const cfg = VERDICT_CONFIG[verdict] || VERDICT_CONFIG.AVOID;
+  const t = useTheme();
+  const cfg = t[verdict] || t.AVOID;
   return (
     <span
       style={{
@@ -2062,6 +2680,7 @@ const VerdictBadge = ({ verdict, size = "sm" }) => {
         fontSize: size === "lg" ? 13 : 10,
         fontWeight: 600,
         letterSpacing: 2,
+        transition: "all 0.5s",
       }}
     >
       {verdict}
@@ -2069,68 +2688,75 @@ const VerdictBadge = ({ verdict, size = "sm" }) => {
   );
 };
 
-const ScoreRing = ({ score, label, color = "#f5c842", size = 80 }) => {
-  const r = 30,
-    c = 2 * Math.PI * r,
-    fill = (score / 100) * c;
+const ScoreRing = ({ score, label, color, size = 88 }) => {
+  const t = useTheme();
+  const ringColor = color || t.accent;
+  const stroke = 6;
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - ((score || 0) / 100) * circumference;
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 6,
-      }}
+      style={{ position: "relative", width: size, height: size, flexShrink: 0 }}
     >
-      <svg
-        width={size}
-        height={size}
-        viewBox="0 0 80 80"
-        style={{ transform: "rotate(-90deg)" }}
-      >
+      <svg width={size} height={size} style={{ display: "block" }}>
         <circle
-          cx="40"
-          cy="40"
-          r={r}
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
           fill="none"
-          stroke="rgba(245,200,66,0.08)"
-          strokeWidth="4"
+          stroke={t.accentBg2}
+          strokeWidth={stroke}
         />
         <circle
-          cx="40"
-          cy="40"
-          r={r}
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
           fill="none"
-          stroke={color}
-          strokeWidth="4"
-          strokeDasharray={`${fill} ${c}`}
+          stroke={ringColor}
+          strokeWidth={stroke}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
           strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
           style={{
-            transition: "stroke-dasharray 1s ease",
-            filter: `drop-shadow(0 0 4px ${color})`,
+            transition: "stroke-dasharray 1s ease, stroke 0.5s",
+            filter: `drop-shadow(0 0 4px ${ringColor})`,
           }}
         />
       </svg>
       <div
         style={{
+          position: "absolute",
+          inset: 0,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
           textAlign: "center",
-          marginTop: -size / 2 - 4,
-          position: "relative",
-          top: -size / 2 + 8,
+          pointerEvents: "none",
         }}
       >
         <div
           style={{
-            fontSize: 18,
-            fontWeight: 600,
-            color,
+            fontSize: 20,
+            fontWeight: 700,
+            color: ringColor,
             lineHeight: 1,
-            textShadow: `0 0 12px ${color}60`,
+            textShadow: `0 0 12px ${ringColor}60`,
+            transition: "color 0.5s",
           }}
         >
           {score}
         </div>
-        <div style={{ fontSize: 9, color: "#5a4820", letterSpacing: 1 }}>
+        <div
+          style={{
+            fontSize: 9,
+            color: t.textFaint,
+            letterSpacing: 1,
+            marginTop: 3,
+          }}
+        >
           {label}
         </div>
       </div>
@@ -2139,14 +2765,15 @@ const ScoreRing = ({ score, label, color = "#f5c842", size = 80 }) => {
 };
 
 const ThinkingItem = ({ item, index }) => {
+  const t = useTheme();
   const isDealKiller = item.fact?.includes("DEAL KILLER");
   const isCritical = item.impact === "CRITICAL";
-  let accentColor = "#3a2e18";
-  if (isDealKiller || item.severity === "HIGH") accentColor = "#ff4d6d";
+  let accentColor = t.textVeryFaint;
+  if (isDealKiller || item.severity === "HIGH") accentColor = t.danger;
   else if (item.strength === "HIGH" || item.impact === "STRENGTHENS_BULL")
-    accentColor = "#f5c842";
+    accentColor = t.bull;
   else if (item.impact === "STRENGTHENS_BEAR" || isCritical)
-    accentColor = "#e8a020";
+    accentColor = t.detective;
   return (
     <div
       className="thinking-appear"
@@ -2155,9 +2782,9 @@ const ThinkingItem = ({ item, index }) => {
         padding: "10px 12px",
         borderLeft: `2px solid ${accentColor}`,
         background: isDealKiller
-          ? "rgba(255,77,109,0.05)"
+          ? t.dangerBg
           : isCritical
-            ? "rgba(232,160,32,0.04)"
+            ? t.secondaryBg
             : "transparent",
         borderRadius: "0 5px 5px 0",
         marginBottom: 8,
@@ -2166,14 +2793,14 @@ const ThinkingItem = ({ item, index }) => {
       <div
         style={{
           fontSize: 11,
-          color: isDealKiller ? "#ff4d6d" : isCritical ? "#e8a020" : "#9a8660",
+          color: isDealKiller ? t.danger : isCritical ? t.detective : t.textMid,
           fontWeight: 500,
           marginBottom: 3,
         }}
       >
         {String(item.fact ?? "")}
       </div>
-      <div style={{ fontSize: 10, color: "#5a4820", lineHeight: 1.5 }}>
+      <div style={{ fontSize: 10, color: t.textFaint, lineHeight: 1.5 }}>
         {String(item.reasoning ?? "")}
       </div>
       {item.source && (
@@ -2183,7 +2810,7 @@ const ThinkingItem = ({ item, index }) => {
           rel="noreferrer"
           style={{
             fontSize: 9,
-            color: "#c9a227",
+            color: t.tertiary,
             display: "block",
             marginTop: 4,
             textDecoration: "none",
@@ -2200,11 +2827,8 @@ const ThinkingItem = ({ item, index }) => {
               padding: "2px 6px",
               borderRadius: 3,
               letterSpacing: 1,
-              background:
-                item.strength === "HIGH"
-                  ? "rgba(245,200,66,0.1)"
-                  : "rgba(58,46,24,0.3)",
-              color: item.strength === "HIGH" ? "#f5c842" : "#5a4820",
+              background: item.strength === "HIGH" ? t.accentBg2 : t.accentBg,
+              color: item.strength === "HIGH" ? t.accent : t.textFaint,
             }}
           >
             STRENGTH:{item.strength}
@@ -2217,11 +2841,8 @@ const ThinkingItem = ({ item, index }) => {
               padding: "2px 6px",
               borderRadius: 3,
               letterSpacing: 1,
-              background:
-                item.severity === "HIGH"
-                  ? "rgba(255,77,109,0.1)"
-                  : "rgba(58,46,24,0.3)",
-              color: item.severity === "HIGH" ? "#ff4d6d" : "#5a4820",
+              background: item.severity === "HIGH" ? t.dangerBg : t.accentBg,
+              color: item.severity === "HIGH" ? t.danger : t.textFaint,
             }}
           >
             SEVERITY:{item.severity}
@@ -2234,8 +2855,8 @@ const ThinkingItem = ({ item, index }) => {
               padding: "2px 6px",
               borderRadius: 3,
               letterSpacing: 1,
-              background: "rgba(58,46,24,0.2)",
-              color: "#7a6840",
+              background: t.accentBg,
+              color: t.textDim,
             }}
           >
             {item.impact}
@@ -2246,36 +2867,25 @@ const ThinkingItem = ({ item, index }) => {
   );
 };
 
-const AGENT_META = {
-  bull: {
-    icon: "◆",
-    label: "BULL AGENT",
-    desc: "Building the case FOR",
-    color: "#f5c842",
-  },
-  bear: {
-    icon: "◈",
-    label: "BEAR AGENT",
-    desc: "Hunting for red flags",
-    color: "#ff4d6d",
-  },
+const AGENT_META_BASE = {
+  bull: { icon: "◆", label: "BULL AGENT", desc: "Building the case FOR" },
+  bear: { icon: "◈", label: "BEAR AGENT", desc: "Hunting for red flags" },
   detective: {
     icon: "◎",
     label: "DETECTIVE AGENT",
     desc: "Auditing all evidence",
-    color: "#e8a020",
   },
   orchestrator: {
     icon: "⊕",
     label: "ORCHESTRATOR",
     desc: "Final verdict engine",
-    color: "#c9a227",
   },
 };
 
 const AgentCard = ({ agent, status, message, thinking = [] }) => {
+  const t = useTheme();
   const [expanded, setExpanded] = useState(false);
-  const meta = AGENT_META[agent];
+  const meta = { ...AGENT_META_BASE[agent], color: t[agent] };
   const isRunning = status === "running",
     isDone = status === "done";
   return (
@@ -2309,8 +2919,9 @@ const AgentCard = ({ agent, status, message, thinking = [] }) => {
         <span
           style={{
             fontSize: 18,
-            color: isDone ? meta.color : isRunning ? meta.color : "#2a2010",
+            color: isDone ? meta.color : isRunning ? meta.color : t.textDarkest,
             textShadow: isDone ? `0 0 12px ${meta.color}60` : "none",
+            transition: "color 0.5s",
           }}
         >
           {meta.icon}
@@ -2320,13 +2931,18 @@ const AgentCard = ({ agent, status, message, thinking = [] }) => {
             style={{
               fontSize: 11,
               fontWeight: 600,
-              color: isDone ? "#e8d9b0" : isRunning ? "#9a8660" : "#2a2010",
+              color: isDone
+                ? t.textPrimary
+                : isRunning
+                  ? t.textMid
+                  : t.textDarkest,
               letterSpacing: 2,
+              transition: "color 0.5s",
             }}
           >
             {meta.label}
           </div>
-          <div style={{ fontSize: 10, color: "#5a4820", marginTop: 2 }}>
+          <div style={{ fontSize: 10, color: t.textFaint, marginTop: 2 }}>
             {message || (isRunning ? meta.desc + "..." : meta.desc)}
           </div>
         </div>
@@ -2338,7 +2954,7 @@ const AgentCard = ({ agent, status, message, thinking = [] }) => {
                 height: 8,
                 borderRadius: "50%",
                 background: meta.color,
-                animation: "pulse-gold 1s ease infinite",
+                animation: "pulse-accent 1s ease infinite",
                 display: "inline-block",
                 boxShadow: `0 0 10px ${meta.color}`,
               }}
@@ -2350,7 +2966,9 @@ const AgentCard = ({ agent, status, message, thinking = [] }) => {
             </span>
           )}
           {status === "pending" && (
-            <span style={{ fontSize: 10, color: "#2a2010", letterSpacing: 1 }}>
+            <span
+              style={{ fontSize: 10, color: t.textDarkest, letterSpacing: 1 }}
+            >
               PENDING
             </span>
           )}
@@ -2380,7 +2998,7 @@ const AgentCard = ({ agent, status, message, thinking = [] }) => {
             padding: "0 16px 16px",
             maxHeight: 300,
             overflowY: "auto",
-            borderTop: "1px solid rgba(245,200,66,0.08)",
+            borderTop: `1px solid ${t.accentBorder}`,
           }}
         >
           <div style={{ paddingTop: 12 }}>
@@ -2395,6 +3013,8 @@ const AgentCard = ({ agent, status, message, thinking = [] }) => {
 };
 
 const TrackCard = ({ track, trackType }) => {
+  const t = useTheme();
+  const isMobile = useIsMobile();
   const [showEmail, setShowEmail] = useState(false);
   if (!track) return null;
   const {
@@ -2407,7 +3027,7 @@ const TrackCard = ({ track, trackType }) => {
     ifHold,
     ifAvoid,
   } = track;
-  const cfg = VERDICT_CONFIG[verdict] || VERDICT_CONFIG.AVOID;
+  const cfg = t[verdict] || t.AVOID;
   return (
     <div
       className="war-card fade-in-up"
@@ -2435,12 +3055,21 @@ const TrackCard = ({ track, trackType }) => {
           <SectionLabel>{trackType} TRACK</SectionLabel>
           <VerdictBadge verdict={verdict} size="lg" />
         </div>
-        <div style={{ display: "flex", gap: 16 }}>
-          <ScoreRing score={confidence} label="CONF" color={cfg.color} />
+        <div
+          className="score-rings"
+          style={{ display: "flex", gap: isMobile ? 8 : 12, flexShrink: 0 }}
+        >
+          <ScoreRing
+            score={confidence}
+            label="CONF"
+            color={cfg.color}
+            size={isMobile ? 64 : 72}
+          />
           <ScoreRing
             score={regretScore?.score || 0}
             label="REGRET"
-            color="#9a6820"
+            color={t.textMid}
+            size={isMobile ? 64 : 72}
           />
         </div>
       </div>
@@ -2448,7 +3077,7 @@ const TrackCard = ({ track, trackType }) => {
         <div
           style={{
             fontSize: 11,
-            color: "#7a6840",
+            color: t.textDim,
             marginBottom: 16,
             fontStyle: "italic",
             lineHeight: 1.6,
@@ -2474,7 +3103,7 @@ const TrackCard = ({ track, trackType }) => {
               >
                 <span
                   style={{
-                    color: "#5a4820",
+                    color: t.textFaint,
                     flexShrink: 0,
                     width: 160,
                     fontSize: 10,
@@ -2482,7 +3111,7 @@ const TrackCard = ({ track, trackType }) => {
                 >
                   {k.replace(/([A-Z])/g, " $1").toUpperCase()}
                 </span>
-                <span style={{ color: "#9a8660" }}>
+                <span style={{ color: t.textMid }}>
                   {typeof v === "object" ? JSON.stringify(v) : String(v)}
                 </span>
               </div>
@@ -2495,9 +3124,9 @@ const TrackCard = ({ track, trackType }) => {
           style={{
             marginBottom: 16,
             padding: 12,
-            background: "rgba(10,7,0,0.5)",
+            background: t.bgInput,
             borderRadius: 8,
-            border: "1px solid rgba(245,200,66,0.08)",
+            border: `1px solid ${t.accentBorder}`,
             backdropFilter: "blur(8px)",
           }}
         >
@@ -2505,17 +3134,17 @@ const TrackCard = ({ track, trackType }) => {
           <div
             style={{
               fontSize: 13,
-              color: "#e8d9b0",
+              color: t.textPrimary,
               fontWeight: 500,
               marginBottom: 4,
             }}
           >
             {targetDecisionMaker.title}
           </div>
-          <div style={{ fontSize: 11, color: "#7a6840", marginBottom: 6 }}>
+          <div style={{ fontSize: 11, color: t.textDim, marginBottom: 6 }}>
             {targetDecisionMaker.why}
           </div>
-          <div style={{ fontSize: 10, color: "#5a4820" }}>
+          <div style={{ fontSize: 10, color: t.textFaint }}>
             🔍 {targetDecisionMaker.linkedinSearchTip}
           </div>
         </div>
@@ -2525,25 +3154,22 @@ const TrackCard = ({ track, trackType }) => {
           style={{
             marginBottom: 16,
             padding: 10,
-            background:
-              verdict === "HOLD"
-                ? "rgba(232,160,32,0.06)"
-                : "rgba(255,77,109,0.06)",
-            border: `1px solid ${verdict === "HOLD" ? "rgba(232,160,32,0.2)" : "rgba(255,77,109,0.2)"}`,
+            background: verdict === "HOLD" ? t.secondaryBg : t.dangerBg,
+            border: `1px solid ${verdict === "HOLD" ? t.secondaryBorder : t.dangerBorder}`,
             borderRadius: 7,
           }}
         >
           <div
             style={{
               fontSize: 10,
-              color: verdict === "HOLD" ? "#e8a020" : "#ff4d6d",
+              color: verdict === "HOLD" ? t.secondary : t.danger,
               letterSpacing: 2,
               marginBottom: 4,
             }}
           >
             {verdict === "HOLD" ? "WATCH FOR" : "NEEDS BEFORE PURSUING"}
           </div>
-          <div style={{ fontSize: 11, color: "#9a8660" }}>
+          <div style={{ fontSize: 11, color: t.textMid }}>
             {ifHold || ifAvoid}
           </div>
         </div>
@@ -2553,9 +3179,9 @@ const TrackCard = ({ track, trackType }) => {
           <button
             onClick={() => setShowEmail((e) => !e)}
             style={{
-              background: "rgba(245,200,66,0.04)",
-              border: "1px solid rgba(245,200,66,0.12)",
-              color: "#7a6840",
+              background: t.accentBg,
+              border: `1px solid ${t.accentBorder}`,
+              color: t.textDim,
               padding: "8px 14px",
               borderRadius: 6,
               fontSize: 11,
@@ -2574,21 +3200,23 @@ const TrackCard = ({ track, trackType }) => {
             <div
               style={{
                 padding: 14,
-                background: "rgba(8,6,0,0.6)",
+                background: t.bgInput,
                 borderRadius: 8,
                 fontSize: 11,
-                border: "1px solid rgba(245,200,66,0.08)",
+                border: `1px solid ${t.accentBorder}`,
                 backdropFilter: "blur(12px)",
               }}
             >
-              <div style={{ color: "#5a4820", marginBottom: 4 }}>SUBJECT:</div>
-              <div style={{ color: "#e8d9b0", marginBottom: 10 }}>
+              <div style={{ color: t.textFaint, marginBottom: 4 }}>
+                SUBJECT:
+              </div>
+              <div style={{ color: t.textPrimary, marginBottom: 10 }}>
                 {outreachEmail.subject}
               </div>
-              <div style={{ color: "#5a4820", marginBottom: 4 }}>BODY:</div>
+              <div style={{ color: t.textFaint, marginBottom: 4 }}>BODY:</div>
               <pre
                 style={{
-                  color: "#9a8660",
+                  color: t.textMid,
                   whiteSpace: "pre-wrap",
                   lineHeight: 1.6,
                   fontFamily: "IBM Plex Mono",
@@ -2606,6 +3234,8 @@ const TrackCard = ({ track, trackType }) => {
 };
 
 const ResultsView = ({ result }) => {
+  const t = useTheme();
+  const isMobile = useIsMobile();
   const {
     companyName,
     domain,
@@ -2633,13 +3263,12 @@ const ResultsView = ({ result }) => {
       style={{ padding: "32px 40px", maxWidth: 1200, margin: "0 auto" }}
       className="fade-in-up"
     >
-      {/* Banner */}
       <div
         className="war-card glow-card"
         style={{
           padding: "24px 28px",
           marginBottom: 24,
-          borderColor: "rgba(245,200,66,0.2)",
+          borderColor: t.accentBorder2,
           position: "relative",
           overflow: "hidden",
         }}
@@ -2651,7 +3280,7 @@ const ResultsView = ({ result }) => {
             left: 0,
             right: 0,
             height: 2,
-            background: "linear-gradient(90deg,#b8860b,#f5c842,transparent)",
+            background: `linear-gradient(90deg,${t.tertiary},${t.accent},transparent)`,
           }}
         />
         <div
@@ -2661,8 +3290,7 @@ const ResultsView = ({ result }) => {
             right: 0,
             bottom: 0,
             width: "30%",
-            background:
-              "radial-gradient(ellipse at right, rgba(245,200,66,0.04), transparent 70%)",
+            background: `radial-gradient(ellipse at right, ${t.accentBg}, transparent 70%)`,
             pointerEvents: "none",
           }}
         />
@@ -2679,7 +3307,7 @@ const ResultsView = ({ result }) => {
             <div
               style={{
                 fontSize: 10,
-                color: "#5a4820",
+                color: t.textFaint,
                 letterSpacing: 3,
                 marginBottom: 6,
               }}
@@ -2691,7 +3319,7 @@ const ResultsView = ({ result }) => {
                 fontFamily: "Syne, sans-serif",
                 fontSize: 28,
                 fontWeight: 800,
-                color: "#f0e8d0",
+                color: t.textHeading,
                 marginBottom: 8,
               }}
             >
@@ -2709,10 +3337,10 @@ const ResultsView = ({ result }) => {
                 style={{
                   fontSize: 11,
                   padding: "3px 10px",
-                  background: "rgba(245,200,66,0.08)",
-                  border: "1px solid rgba(245,200,66,0.2)",
+                  background: t.accentBg,
+                  border: `1px solid ${t.accentBorder}`,
                   borderRadius: 5,
-                  color: "#f5c842",
+                  color: t.accent,
                   letterSpacing: 2,
                 }}
               >
@@ -2722,10 +3350,10 @@ const ResultsView = ({ result }) => {
                 style={{
                   fontSize: 11,
                   padding: "3px 10px",
-                  background: "rgba(232,160,32,0.08)",
-                  border: "1px solid rgba(232,160,32,0.2)",
+                  background: t.secondaryBg,
+                  border: `1px solid ${t.secondaryBorder}`,
                   borderRadius: 5,
-                  color: "#e8a020",
+                  color: t.secondary,
                   letterSpacing: 1,
                 }}
               >
@@ -2739,9 +3367,9 @@ const ResultsView = ({ result }) => {
             style={{
               marginTop: 16,
               paddingTop: 16,
-              borderTop: "1px solid rgba(245,200,66,0.08)",
+              borderTop: `1px solid ${t.accentBorder}`,
               fontSize: 13,
-              color: "#9a8660",
+              color: t.textMid,
               lineHeight: 1.7,
               maxWidth: 800,
             }}
@@ -2754,7 +3382,7 @@ const ResultsView = ({ result }) => {
             style={{
               marginTop: 10,
               fontSize: 11,
-              color: "#7a6840",
+              color: t.textDim,
               fontStyle: "italic",
             }}
           >
@@ -2762,7 +3390,6 @@ const ResultsView = ({ result }) => {
           </div>
         )}
       </div>
-
       <div
         style={{
           display: "grid",
@@ -2774,7 +3401,6 @@ const ResultsView = ({ result }) => {
         <TrackCard track={customerTrack} trackType="CUSTOMER" />
         <TrackCard track={partnerTrack} trackType="PARTNER" />
       </div>
-
       <div
         style={{
           display: "grid",
@@ -2790,8 +3416,8 @@ const ResultsView = ({ result }) => {
               key={i}
               style={{ display: "flex", gap: 8, marginBottom: 8, fontSize: 11 }}
             >
-              <span style={{ color: "#f5c842", flexShrink: 0 }}>+</span>
-              <span style={{ color: "#9a8660" }}>
+              <span style={{ color: t.bull, flexShrink: 0 }}>+</span>
+              <span style={{ color: t.textMid }}>
                 {typeof a === "object"
                   ? a.advantage || a.text || JSON.stringify(a)
                   : String(a ?? "")}
@@ -2803,7 +3429,7 @@ const ResultsView = ({ result }) => {
               <div
                 style={{
                   height: 1,
-                  background: "rgba(245,200,66,0.08)",
+                  background: t.accentBorder,
                   margin: "12px 0",
                 }}
               />
@@ -2818,8 +3444,8 @@ const ResultsView = ({ result }) => {
                     fontSize: 11,
                   }}
                 >
-                  <span style={{ color: "#ff4d6d", flexShrink: 0 }}>−</span>
-                  <span style={{ color: "#9a8660" }}>
+                  <span style={{ color: t.danger, flexShrink: 0 }}>−</span>
+                  <span style={{ color: t.textMid }}>
                     {typeof d === "object"
                       ? d.disadvantage || d.text || JSON.stringify(d)
                       : String(d ?? "")}
@@ -2829,7 +3455,7 @@ const ResultsView = ({ result }) => {
             </>
           )}
         </div>
-        <div className="war-card" style={{ padding: 20 }}>
+        <div className="war-card" style={{ padding: isMobile ? 16 : 20 }}>
           <SectionLabel>PROPOSED NEXT STEPS</SectionLabel>
           {(proposedNextSteps || []).map((step, i) => (
             <div
@@ -2842,11 +3468,11 @@ const ResultsView = ({ result }) => {
               }}
             >
               <span
-                style={{ color: "#5a4820", flexShrink: 0, fontWeight: 600 }}
+                style={{ color: t.textFaint, flexShrink: 0, fontWeight: 600 }}
               >
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <span style={{ color: "#9a8660", lineHeight: 1.5 }}>
+              <span style={{ color: t.textMid, lineHeight: 1.5 }}>
                 {typeof step === "object"
                   ? step.step ||
                     step.action ||
@@ -2858,7 +3484,6 @@ const ResultsView = ({ result }) => {
           ))}
         </div>
       </div>
-
       {documents && (
         <div className="war-card" style={{ padding: 20 }}>
           <SectionLabel>GENERATED DOCUMENTS</SectionLabel>
@@ -2897,10 +3522,8 @@ const ResultsView = ({ result }) => {
                 disabled={!file}
                 data-hover
                 style={{
-                  background: file
-                    ? "rgba(245,200,66,0.05)"
-                    : "rgba(20,14,4,0.3)",
-                  border: `1px solid ${file ? "rgba(245,200,66,0.18)" : "rgba(245,200,66,0.05)"}`,
+                  background: file ? t.accentBg : t.bgCard,
+                  border: `1px solid ${file ? t.accentBorder : t.accentBg}`,
                   borderRadius: 8,
                   padding: "14px 12px",
                   cursor: file ? "none" : "not-allowed",
@@ -2914,7 +3537,7 @@ const ResultsView = ({ result }) => {
                   style={{
                     fontSize: 20,
                     marginBottom: 6,
-                    color: file ? "#f5c842" : "#2a2010",
+                    color: file ? t.accent : t.textDarkest,
                   }}
                 >
                   {ext === "PDF" ? "📋" : "📄"}
@@ -2922,7 +3545,7 @@ const ResultsView = ({ result }) => {
                 <div
                   style={{
                     fontSize: 10,
-                    color: file ? "#9a8660" : "#2a2010",
+                    color: file ? t.textMid : t.textDarkest,
                     letterSpacing: 1,
                   }}
                 >
@@ -2931,7 +3554,7 @@ const ResultsView = ({ result }) => {
                 <div
                   style={{
                     fontSize: 9,
-                    color: file ? "#f5c842" : "#2a2010",
+                    color: file ? t.accent : t.textDarkest,
                     marginTop: 2,
                     letterSpacing: 2,
                   }}
@@ -2948,6 +3571,8 @@ const ResultsView = ({ result }) => {
 };
 
 const WarRoom = ({ user, onNav }) => {
+  const t = useTheme();
+  const isMobile = useIsMobile();
   const [appState, setAppState] = useState("IDLE");
   const [clientUrl, setClientUrl] = useState("");
   const [clientProfile, setClientProfile] = useState("");
@@ -3077,7 +3702,7 @@ const WarRoom = ({ user, onNav }) => {
       setAgentStatus((s) => ({ ...s, [a]: "done" }));
       setAgentMessages((m) => ({ ...m, [a]: event.message || "" }));
       if (event.thinking)
-        setAgentThinking((t) => ({ ...t, [a]: event.thinking }));
+        setAgentThinking((th) => ({ ...th, [a]: event.thinking }));
     } else if (phase === "COMPLETE") {
       setResult(event.result);
       setAppState("RESULTS");
@@ -3089,7 +3714,7 @@ const WarRoom = ({ user, onNav }) => {
     }
   }, []);
 
-  const goldBtn = (onClick, disabled, label, loading = false) => (
+  const goldBtn = (onClick, disabled, label) => (
     <button
       onClick={onClick}
       disabled={disabled}
@@ -3102,23 +3727,26 @@ const WarRoom = ({ user, onNav }) => {
         fontWeight: 600,
         letterSpacing: 1,
         cursor: disabled ? "not-allowed" : "none",
-        background: disabled
-          ? "rgba(245,200,66,0.05)"
-          : "linear-gradient(135deg,#b8860b,#f5c842,#c9a227)",
-        color: disabled ? "#3a2e18" : "#0d0900",
+        background: disabled ? t.accentBg : t.logoGradientBtn,
+        color: disabled ? t.textFaint : t.logoColor,
         border: "none",
         opacity: disabled ? 0.45 : 1,
         transition: "all 0.2s",
-        boxShadow: disabled ? "none" : "0 4px 16px rgba(245,200,66,0.2)",
+        boxShadow: disabled ? "none" : `0 4px 16px ${t.accentGlow}`,
       }}
     >
-      {loading ? "PROCESSING..." : label}
+      {label}
     </button>
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080600" }}>
-      {/* IDLE / PROFILING */}
+    <div
+      style={{
+        minHeight: "100vh",
+        background: t.bg,
+        transition: "background 0.5s",
+      }}
+    >
       {(appState === "IDLE" || appState === "PROFILING") && (
         <div
           style={{ maxWidth: 560, margin: "80px auto", padding: "0 24px" }}
@@ -3135,8 +3763,7 @@ const WarRoom = ({ user, onNav }) => {
                 left: 32,
                 right: 32,
                 height: 1,
-                background:
-                  "linear-gradient(90deg,transparent,rgba(245,200,66,0.3),transparent)",
+                background: `linear-gradient(90deg,transparent,${t.accentBorder2},transparent)`,
               }}
             />
             <div
@@ -3144,7 +3771,7 @@ const WarRoom = ({ user, onNav }) => {
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 800,
                 fontSize: 22,
-                color: "#f0e8d0",
+                color: t.textHeading,
                 marginBottom: 6,
                 letterSpacing: 1,
               }}
@@ -3154,7 +3781,7 @@ const WarRoom = ({ user, onNav }) => {
             <div
               style={{
                 fontSize: 12,
-                color: "#5a4820",
+                color: t.textFaint,
                 marginBottom: 28,
                 lineHeight: 1.6,
               }}
@@ -3175,12 +3802,12 @@ const WarRoom = ({ user, onNav }) => {
               <div
                 style={{
                   fontSize: 11,
-                  color: "#ff4d6d",
+                  color: t.danger,
                   marginTop: 10,
                   padding: "8px 12px",
-                  background: "rgba(255,77,109,0.07)",
+                  background: t.dangerBg,
                   borderRadius: 6,
-                  border: "1px solid rgba(255,77,109,0.2)",
+                  border: `1px solid ${t.dangerBorder}`,
                 }}
               >
                 ✗ {profileError}
@@ -3200,11 +3827,11 @@ const WarRoom = ({ user, onNav }) => {
                 style={{
                   marginTop: 20,
                   padding: "12px 16px",
-                  background: "rgba(8,6,0,0.5)",
+                  background: t.bgInput,
                   borderRadius: 8,
                   fontSize: 11,
-                  color: "#5a4820",
-                  border: "1px solid rgba(245,200,66,0.06)",
+                  color: t.textFaint,
+                  border: `1px solid ${t.accentBorder}`,
                   backdropFilter: "blur(8px)",
                 }}
               >
@@ -3213,7 +3840,7 @@ const WarRoom = ({ user, onNav }) => {
                     animation: "blink 1s infinite",
                     display: "inline-block",
                     marginRight: 8,
-                    color: "#f5c842",
+                    color: t.accent,
                   }}
                 >
                   ▌
@@ -3225,7 +3852,6 @@ const WarRoom = ({ user, onNav }) => {
         </div>
       )}
 
-      {/* READY */}
       {appState === "READY" && (
         <div
           style={{ maxWidth: 720, margin: "40px auto", padding: "0 24px" }}
@@ -3236,7 +3862,7 @@ const WarRoom = ({ user, onNav }) => {
             style={{
               padding: 20,
               marginBottom: 20,
-              borderColor: "rgba(245,200,66,0.2)",
+              borderColor: t.accentBorder2,
               position: "relative",
               overflow: "hidden",
             }}
@@ -3248,8 +3874,7 @@ const WarRoom = ({ user, onNav }) => {
                 left: 0,
                 right: 0,
                 height: 1,
-                background:
-                  "linear-gradient(90deg,transparent,rgba(245,200,66,0.3),transparent)",
+                background: `linear-gradient(90deg,transparent,${t.accentBorder2},transparent)`,
               }}
             />
             <div
@@ -3263,23 +3888,23 @@ const WarRoom = ({ user, onNav }) => {
                 <div
                   style={{
                     fontSize: 10,
-                    color: "#f5c842",
+                    color: t.accent,
                     letterSpacing: 2,
                     marginBottom: 4,
                   }}
                 >
                   ✓ CLIENT PROFILE LOADED
                 </div>
-                <div style={{ fontSize: 12, color: "#9a8660" }}>
+                <div style={{ fontSize: 12, color: t.textMid }}>
                   {clientUrl}
                 </div>
               </div>
               <button
                 onClick={() => setProfilePreview((p) => !p)}
                 style={{
-                  background: "rgba(245,200,66,0.05)",
-                  border: "1px solid rgba(245,200,66,0.15)",
-                  color: "#7a6840",
+                  background: t.accentBg,
+                  border: `1px solid ${t.accentBorder}`,
+                  color: t.textDim,
                   padding: "6px 14px",
                   borderRadius: 6,
                   fontSize: 10,
@@ -3298,16 +3923,16 @@ const WarRoom = ({ user, onNav }) => {
                 style={{
                   marginTop: 16,
                   padding: 12,
-                  background: "rgba(4,3,0,0.5)",
+                  background: t.bgInput,
                   borderRadius: 8,
                   fontSize: 10,
-                  color: "#7a6840",
+                  color: t.textDim,
                   whiteSpace: "pre-wrap",
                   lineHeight: 1.6,
                   maxHeight: 200,
                   overflowY: "auto",
                   fontFamily: "IBM Plex Mono",
-                  border: "1px solid rgba(245,200,66,0.06)",
+                  border: `1px solid ${t.accentBorder}`,
                 }}
               >
                 {clientProfile}
@@ -3325,8 +3950,7 @@ const WarRoom = ({ user, onNav }) => {
                 left: 32,
                 right: 32,
                 height: 1,
-                background:
-                  "linear-gradient(90deg,transparent,rgba(245,200,66,0.2),transparent)",
+                background: `linear-gradient(90deg,transparent,${t.accentBorder},transparent)`,
               }}
             />
             <div
@@ -3334,13 +3958,13 @@ const WarRoom = ({ user, onNav }) => {
                 fontFamily: "Syne, sans-serif",
                 fontWeight: 700,
                 fontSize: 18,
-                color: "#f0e8d0",
+                color: t.textHeading,
                 marginBottom: 6,
               }}
             >
               RUN TARGET ANALYSIS
             </div>
-            <div style={{ fontSize: 11, color: "#5a4820", marginBottom: 24 }}>
+            <div style={{ fontSize: 11, color: t.textFaint, marginBottom: 24 }}>
               Enter the domain of a company to evaluate as a potential customer
               or partner.
             </div>
@@ -3356,14 +3980,13 @@ const WarRoom = ({ user, onNav }) => {
               />
               {goldBtn(handleAnalyze, !targetDomain.trim(), "ANALYZE →")}
             </div>
-            <div style={{ marginTop: 10, fontSize: 10, color: "#2a2010" }}>
+            <div style={{ marginTop: 10, fontSize: 10, color: t.textDarkest }}>
               Strip https:// and www. — just the root domain
             </div>
           </div>
         </div>
       )}
 
-      {/* ANALYZING / ERROR */}
       {(appState === "ANALYZING" || appState === "ERROR") && (
         <div
           style={{ maxWidth: 680, margin: "40px auto", padding: "0 24px" }}
@@ -3376,9 +3999,9 @@ const WarRoom = ({ user, onNav }) => {
                   fontFamily: "Syne, sans-serif",
                   fontWeight: 800,
                   fontSize: 24,
-                  color: "#f0e8d0",
+                  color: t.textHeading,
                   letterSpacing: 1,
-                  textShadow: "0 0 30px rgba(245,200,66,0.15)",
+                  textShadow: `0 0 30px ${t.accentBg2}`,
                 }}
               >
                 {companyName}
@@ -3386,7 +4009,7 @@ const WarRoom = ({ user, onNav }) => {
               <div
                 style={{
                   fontSize: 11,
-                  color: "#5a4820",
+                  color: t.textFaint,
                   letterSpacing: 2,
                   marginTop: 4,
                 }}
@@ -3411,11 +4034,11 @@ const WarRoom = ({ user, onNav }) => {
               <div
                 style={{
                   padding: "14px 16px",
-                  background: "rgba(255,77,109,0.07)",
-                  border: "1px solid rgba(255,77,109,0.25)",
+                  background: t.dangerBg,
+                  border: `1px solid ${t.dangerBorder}`,
                   borderRadius: 8,
                   fontSize: 12,
-                  color: "#ff4d6d",
+                  color: t.danger,
                   marginBottom: 12,
                 }}
               >
@@ -3431,9 +4054,9 @@ const WarRoom = ({ user, onNav }) => {
                   fontSize: 12,
                   letterSpacing: 1,
                   cursor: "none",
-                  background: "rgba(245,200,66,0.05)",
-                  color: "#f5c842",
-                  border: "1px solid rgba(245,200,66,0.2)",
+                  background: t.accentBg,
+                  color: t.accent,
+                  border: `1px solid ${t.accentBorder}`,
                 }}
               >
                 ← RETRY
@@ -3443,7 +4066,6 @@ const WarRoom = ({ user, onNav }) => {
         </div>
       )}
 
-      {/* RESULTS */}
       {appState === "RESULTS" && result && (
         <>
           <div
@@ -3451,9 +4073,9 @@ const WarRoom = ({ user, onNav }) => {
               display: "flex",
               gap: 12,
               padding: "16px 40px",
-              borderBottom: "1px solid rgba(245,200,66,0.08)",
+              borderBottom: `1px solid ${t.accentBorder}`,
               alignItems: "center",
-              background: "rgba(8,6,0,0.4)",
+              background: t.bgOverlay,
               backdropFilter: "blur(12px)",
             }}
           >
@@ -3467,16 +4089,18 @@ const WarRoom = ({ user, onNav }) => {
                 fontSize: 11,
                 letterSpacing: 1,
                 cursor: "none",
-                background: "rgba(245,200,66,0.05)",
-                color: "#f5c842",
-                border: "1px solid rgba(245,200,66,0.18)",
+                background: t.accentBg,
+                color: t.accent,
+                border: `1px solid ${t.accentBorder}`,
                 transition: "all 0.2s",
               }}
             >
               ← NEW ANALYSIS
             </button>
-            <span style={{ fontSize: 10, color: "#2a2010" }}>|</span>
-            <span style={{ fontSize: 10, color: "#5a4820", letterSpacing: 1 }}>
+            <span style={{ fontSize: 10, color: t.textDarkest }}>|</span>
+            <span
+              style={{ fontSize: 10, color: t.textFaint, letterSpacing: 1 }}
+            >
               {result.domain} · {result.confirmedScale}
             </span>
           </div>
@@ -3489,7 +4113,7 @@ const WarRoom = ({ user, onNav }) => {
           textAlign: "center",
           padding: "40px 24px",
           fontSize: 10,
-          color: "#2a2010",
+          color: t.textDarkest,
           letterSpacing: 2,
         }}
       >
@@ -3505,6 +4129,9 @@ const WarRoom = ({ user, onNav }) => {
 export default function App() {
   const [page, setPage] = useState("landing");
   const [user, setUser] = useState(null);
+  const [themeName, setThemeName] = useState("gold");
+  const isMobile = useIsMobile();
+  const theme = THEMES[themeName];
 
   const handleNav = (target) => {
     if (target === "warroom" && !user) {
@@ -3526,18 +4153,47 @@ export default function App() {
     setPage("landing");
   };
 
+  const handleToggleTheme = () => {
+    setThemeName((n) => (n === "gold" ? "purple" : "gold"));
+  };
+
+  // Ensure mobile viewport is set
+  useEffect(() => {
+    let meta = document.querySelector("meta[name=viewport]");
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "viewport";
+      document.head.appendChild(meta);
+    }
+    meta.content = "width=device-width, initial-scale=1, maximum-scale=1";
+  }, []);
+
+  // Update cursor colors when theme changes
+  useEffect(() => {
+    const outer = document.getElementById("cursor-outer");
+    const inner = document.getElementById("cursor-inner");
+    if (outer) {
+      outer.style.borderColor = theme.accentDim;
+    }
+    if (inner) {
+      inner.style.background = theme.cursorInner;
+      inner.style.boxShadow = theme.cursorGlow;
+    }
+  }, [themeName, theme]);
+
   return (
-    <>
-      <style>{STYLES}</style>
+    <ThemeContext.Provider value={theme}>
+      <style>{makeStyles(theme)}</style>
       <Cursor />
       <Nav
         page={page}
         onNav={(p) =>
           p === "landing" && user
-            ? handleLogout() || handleNav("landing")
+            ? (handleLogout(), handleNav("landing"))
             : p === "warroom" || handleNav(p)
         }
         user={user}
+        onToggleTheme={handleToggleTheme}
       />
       <div style={{ paddingTop: page === "landing" ? 0 : 73 }}>
         {page === "landing" && <LandingPage onNav={handleNav} />}
@@ -3549,6 +4205,6 @@ export default function App() {
         )}
         {page === "warroom" && <WarRoom user={user} onNav={handleNav} />}
       </div>
-    </>
+    </ThemeContext.Provider>
   );
 }
