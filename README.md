@@ -281,4 +281,4 @@ outreach emails calibrated to the target's scale, recommends which track to purs
 
 ## Built At
 
-Built during a 12-hour hackathon by Team ALLYVEX, powered by DataVex.
+Built during a 24-hour hackathon by Team ALLYVEX, powered by DataVex.
