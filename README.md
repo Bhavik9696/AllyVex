@@ -1,4 +1,4 @@
-# ALLYVEX hello
+# ALLYVEX 
 ### Autonomous Strategic Sales Intelligence Engine
 
 > Give it a company domain. It figures out everything else.
